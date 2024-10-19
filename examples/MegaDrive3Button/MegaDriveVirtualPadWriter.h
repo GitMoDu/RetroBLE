@@ -17,7 +17,8 @@ private:
 		FeaturesEnum::A, FeaturesEnum::B,
 		FeaturesEnum::X>();
 
-	static constexpr uint8_t PIN_INPUT_MODE = INPUT_PULLDOWN;
+protected:
+	static constexpr uint8_t PIN_INPUT_MODE = INPUT;
 
 public:
 	MegaDriveVirtualPadWriter()
@@ -52,18 +53,18 @@ public:
 			SetConnected(true);
 		}
 
-		WriteVirtualPad::SetA(digitalRead((uint8_t)ControllerPin::AB));
-		WriteVirtualPad::SetStart(digitalRead((uint8_t)ControllerPin::StartC));
+		WriteVirtualPad::SetA(!digitalRead((uint8_t)ControllerPin::AB));
+		WriteVirtualPad::SetStart(!digitalRead((uint8_t)ControllerPin::StartC));
 
 		digitalWrite((uint8_t)ControllerPin::Select, HIGH);
-		WriteVirtualPad::SetB(digitalRead((uint8_t)ControllerPin::AB));
-		WriteVirtualPad::SetX(digitalRead((uint8_t)ControllerPin::StartC));
+		WriteVirtualPad::SetB(!digitalRead((uint8_t)ControllerPin::AB));
+		WriteVirtualPad::SetX(!digitalRead((uint8_t)ControllerPin::StartC));
 
 		WriteVirtualPad::SetDPad(
-			digitalRead((uint8_t)ControllerPin::Up),
-			digitalRead((uint8_t)ControllerPin::Down),
-			digitalRead((uint8_t)ControllerPin::InfoLeft),
-			digitalRead((uint8_t)ControllerPin::InfoRight)
+			!digitalRead((uint8_t)ControllerPin::Up),
+			!digitalRead((uint8_t)ControllerPin::Down),
+			!digitalRead((uint8_t)ControllerPin::InfoLeft),
+			!digitalRead((uint8_t)ControllerPin::InfoRight)
 		);
 
 		digitalWrite((uint8_t)ControllerPin::Select, LOW);

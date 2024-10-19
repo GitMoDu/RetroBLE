@@ -44,13 +44,13 @@ namespace Device
 	{
 		enum class Pin : uint8_t
 		{
-			Up = D0,
-			Down = D1,
-			InfoLeft = D2,
+			Up = D6,
+			Down = D5,
+			InfoLeft = D4,
 			InfoRight = D3,
-			AB = D4,
-			StartC = D5,
-			Select = D6
+			AB = D1,
+			StartC = D0,
+			Select = D2
 		};
 	}
 
