@@ -9,7 +9,7 @@
 
 #include "BleConfig.h"
 
-#include "../Platform/RetroBleDevice.h"
+#include "../Framework/RetroBleDevice.h"
 
 
 /// <summary>
