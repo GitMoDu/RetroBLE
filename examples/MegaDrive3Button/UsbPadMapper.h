@@ -18,7 +18,6 @@ class UsbPadMapperTask : private TS::Task
 private:
 	MegaDriveVirtualPad& Source;
 
-	UsbPeripheral& UsbDevice;
 	UsbHidGamepad& UsbGamepad;
 
 private:
@@ -30,16 +29,12 @@ private:
 
 	uint32_t LastActivity = 0;
 
-	ButtonParser::ActionTimed StartHold{};
-
 public:
 	UsbPadMapperTask(TS::Scheduler& scheduler,
 		MegaDriveVirtualPad& source,
-		UsbPeripheral& usbDevice,
 		UsbHidGamepad& usbGamepad)
 		: TS::Task(UpdatePeriod, TASK_FOREVER, &scheduler, false)
 		, Source(source)
-		, UsbDevice(usbDevice)
 		, UsbGamepad(usbGamepad)
 	{}
 
@@ -79,13 +74,6 @@ public:
 	virtual bool Callback() final
 	{
 		Source.Step();
-
-		// Linux mapping
-		//HidReport.buttons =
-		//	(GAMEPAD_BUTTON_A * Source.A())
-		//	| (GAMEPAD_BUTTON_B * Source.B())
-		//	| (GAMEPAD_BUTTON_C * Source.X())
-		//	| (GAMEPAD_BUTTON_START * Source.Start());
 
 		// Same mapping as 8BitDo M30 and S30.
 		HidReport.buttons =
@@ -128,8 +116,6 @@ public:
 			break;
 		}
 
-		StartHold.Parse(millis(), Source.Start());
-
 		if (UsbGamepad.IsReady()
 			&& ((LastHidReport.buttons != HidReport.buttons)
 				|| (LastHidReport.hat != HidReport.hat))
@@ -143,11 +129,6 @@ public:
 		}
 
 		return true;
-	}
-
-	const bool IsStartLongPressed(const uint32_t durationMillis)
-	{
-		return StartHold.ActionDown(durationMillis);
 	}
 
 	const uint32_t GetElapsedMillisSinceLastActivity()

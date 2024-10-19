@@ -2,15 +2,15 @@
 * Retro BLE Pad implementation for MegaDrive/Genesis 3-Button controller.
 *
 * Retro BLE features
-*	- USB HID interface, takes precedence over any BLE connection. TODO:
-*	- BLE interface with ~12ms update period. TODO:
-*	- Battery charging state.
+*	- USB HID interface, takes precedence over any BLE connection.
+*	- BLE interface with ~12ms update period.
 *	- Battery level state.
+*	- State LEDs.
 *
 * Dependencies:
 *	- Core https://github.com/Seeed-Studio/OSHW-XIAO-Series
 *	- BLE https://github.com/adafruit/Adafruit_nRF52_Arduino/blob/master/libraries/Bluefruit52Lib/src/bluefruit.h
-*
+*	- USB https://github.com/adafruit/Adafruit_TinyUSB_Arduino
 */
 
 //#define DEBUG

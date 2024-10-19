@@ -1,7 +1,7 @@
 // Maestro.h
 
-#ifndef _CONNECTIONWATCHER_h
-#define _CONNECTIONWATCHER_h
+#ifndef _MAESTRO_h
+#define _MAESTRO_h
 
 #define _TASK_OO_CALLBACKS
 #include <TaskSchedulerDeclarations.h>
@@ -121,7 +121,7 @@ public:
 				BlePad.Start();
 				TS::Task::delay(0);
 
-				
+
 			}
 			else if (BleDev.IsAdvertising()
 				&& (millis() - LastActivity < RetroBle::BleConfig::ADVERTISE_NO_ACTIVITY_TIMEOUT_MILLIS))
@@ -150,7 +150,7 @@ public:
 			else if (BleDev.IsConnected())
 			{
 				if (BlePad.GetElapsedMillisSinceLastActivity() < RetroBle::BleConfig::CONNECTED_NO_ACTIVITY_TIMEOUT_MILLIS
-					&& !BlePad.IsStartLongPressed(Device::GamePad::LONG_PRESS_POWER_OFF_PERIOD_MILLIS))
+					&& !BlePad.IsStartLongPressed(Device::BLE::LONG_PRESS_POWER_OFF_PERIOD_MILLIS))
 				{
 					BMS->GetBatteryState(BatteryState);
 					Lights.SetDrawMode(LedAnimatorTask::ConnectionLights::Ble, BatteryState.Charging);
@@ -250,41 +250,28 @@ private:
 
 	const bool UsbConnected()
 	{
-		return UsbDev.IsConnected(); //&& UsbPad.IsConnected();
+		return UsbDev.IsConnected();
 	}
 
 	void ExecuteLowPowerMode()
 	{
+		BMS->GetBatteryState(BatteryState);
+
 		// Wake up gamepad pin.
 		// Pulled down and wakes up when externally connected to 3.3V.
 		pinMode(Device::GamePad::WakePin, INPUT_PULLDOWN_SENSE);
 
-		bool charging = BatteryState.Charging;
-
-		BMS->GetBatteryState(BatteryState);
-
-		if (charging == BatteryState.Charging)
+		if (BatteryState.Charging)
 		{
 			// Wake on battery charge change.
 			if (!BatteryState.Charging)
 			{
-				pinMode(Device::BMS::WakePin, INPUT_SENSE_LOW);	// Wakes up when externally connected to ground.
+				pinMode(Device::BMS::Pin::ChargingPin, INPUT_SENSE_LOW);	// Wakes up when externally connected to ground.
 			}
 			else
 			{
-				pinMode(Device::BMS::WakePin, INPUT_SENSE_HIGH);// Wakes up when externally connected to 3.3V.
+				pinMode(Device::BMS::Pin::ChargingPin, INPUT_SENSE_HIGH);// Wakes up when externally connected to 3.3V.
 			}
-
-			//noInterrupts();
-			//if (digitalRead(Device::BMS::WakePin))
-			//{
-			//	pinMode(Device::BMS::WakePin, INPUT_SENSE_LOW);	// Wakes up when externally connected to ground.
-			//}
-			//else
-			//{
-			//	pinMode(Device::BMS::WakePin, INPUT_SENSE_HIGH);// Wakes up when externally connected to 3.3V.
-			//}
-			//interrupts();
 
 			// Power down nRF52: puts the whole nRF52 to deep sleep (no Bluetooth).  If no sense pins are setup (or other hardware interrupts), the nrf52 will not wake up.
 			sd_power_system_off();

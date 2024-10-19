@@ -7,9 +7,7 @@
 #include <TaskSchedulerDeclarations.h>
 
 #include <Arduino.h>
-
 #include <bluefruit.h>
-
 #include <VirtualPad.h>
 
 template<typename MegaDriveVirtualPad,
@@ -75,13 +73,6 @@ public:
 	{
 		Source.Step();
 
-		// Linux mapping
-		//HidReport.buttons =
-		//	(GAMEPAD_BUTTON_A * Source.A())
-		//	| (GAMEPAD_BUTTON_B * Source.B())
-		//	| (GAMEPAD_BUTTON_C * Source.X())
-		//	| (GAMEPAD_BUTTON_START * Source.Start());
-
 		// Same mapping as 8BitDo M30 and S30.
 		HidReport.buttons =
 			(GAMEPAD_BUTTON_0 * Source.A())
@@ -123,9 +114,9 @@ public:
 			break;
 		}
 
-		BleGamepad.report(&HidReport);
-
 		StartHold.Parse(millis(), Source.Start());
+
+		BleGamepad.report(&HidReport);
 
 		if ((LastHidReport.buttons != HidReport.buttons)
 			|| (LastHidReport.hat != HidReport.hat))

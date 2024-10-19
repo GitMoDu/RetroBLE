@@ -30,8 +30,6 @@ namespace Device
 		using Pin = SeeedXIAOnRF52840::BMS::Pin;
 		using Calibration = SeeedXIAOnRF52840::BMS::Bq25100Calibration;
 
-		static constexpr uint8_t WakePin = (uint8_t)Pin::ChargingPin;
-
 		static constexpr uint8_t HistorySize = 50;
 		static constexpr uint32_t UpdatePeriodMillis = 100;
 	}
@@ -61,6 +59,8 @@ namespace Device
 		static constexpr uint32_t UpdatePeriodMillis = 15;
 
 		static constexpr RetroBle::BleConfig::Appearance Appearance = RetroBle::BleConfig::Appearance::GamePad;
+
+		static constexpr uint32_t LONG_PRESS_POWER_OFF_PERIOD_MILLIS = 5000;
 	}
 
 	namespace USB
@@ -73,9 +73,8 @@ namespace Device
 
 	namespace GamePad
 	{
-		static constexpr uint32_t LONG_PRESS_POWER_OFF_PERIOD_MILLIS = 5000;
-
 		static constexpr uint8_t WakePin = (uint8_t)MegaDriveController::Pin::StartC;
+
 	}
 
 	struct Unused
