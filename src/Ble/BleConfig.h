@@ -16,7 +16,9 @@ namespace RetroBle
 		enum class Appearance : uint16_t
 		{
 			GamePad = BLE_APPEARANCE_HID_GAMEPAD,
-			Keyboard = BLE_APPEARANCE_HID_KEYBOARD
+			Keyboard = BLE_APPEARANCE_HID_KEYBOARD,
+			Mouse = BLE_APPEARANCE_HID_MOUSE,
+			WeightScale = BLE_APPEARANCE_GENERIC_WEIGHT_SCALE
 		};
 
 		/* Set connection interval (min, max) to your perferred value.

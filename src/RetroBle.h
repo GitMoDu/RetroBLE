@@ -30,8 +30,10 @@
 #include "Usb/UsbPeripheral.h"
 
 #include "Usb/UsbHidGamepad.h"
+#include "Usb/UsbHidKeyboard.h"
 
 #include "HidDevice/HidGamepadTask.h"
+#include "HidDevice/HidKeyboardTask.h"
 
 #include "Framework/UsbBleCoordinator.h"
 
