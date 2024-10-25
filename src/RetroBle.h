@@ -6,7 +6,12 @@
 
 #if defined(ARDUINO_Seeed_XIAO_nRF52840_Sense) || defined(ARDUINO_Seeed_XIAO_nRF52840)
 #include "Platform/SeeedXIAOnRF52840.h"
+#elif defined(ARDUINO_ARCH_NRF52)
+#include "Platform/NologoProMicronRF52840.h"
+#else
+#pragma "Device not supported."
 #endif
+
 
 #include "Framework/RetroBleDevice.h"
 
