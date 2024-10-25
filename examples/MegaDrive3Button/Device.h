@@ -1,13 +1,10 @@
-// Definitions.h
+// Device.h
 
-#ifndef _DEFINITIONS_h
-#define _DEFINITIONS_h
-
-#include <Arduino.h>
-#include <RetroBle.h>
+#ifndef _DEVICE_h
+#define _DEVICE_h
 
 #if defined(ARDUINO_Seeed_XIAO_nRF52840_Sense) || defined(ARDUINO_Seeed_XIAO_nRF52840)
-#include <variant.h>
+#include <RetroBle.h>
 
 namespace Device
 {
@@ -30,8 +27,8 @@ namespace Device
 		using Pin = SeeedXIAOnRF52840::BMS::Pin;
 		using Calibration = SeeedXIAOnRF52840::BMS::Bq25100Calibration;
 
-		static constexpr uint8_t HistorySize = 50;
-		static constexpr uint32_t UpdatePeriodMillis = 100;
+		static constexpr uint8_t HistorySize = 10;
+		static constexpr uint32_t UpdatePeriodMillis = 50;
 	}
 
 	namespace Led
@@ -52,11 +49,13 @@ namespace Device
 			StartC = D0,
 			Select = D2
 		};
+
+		static constexpr uint8_t WakePin = (uint8_t)Pin::StartC;
 	}
 
 	namespace BLE
 	{
-		static constexpr uint32_t UpdatePeriodMillis = 15;
+		static constexpr uint32_t UpdatePeriodMillis = 10;
 
 		static constexpr RetroBle::BleConfig::Appearance Appearance = RetroBle::BleConfig::Appearance::GamePad;
 
@@ -77,9 +76,9 @@ namespace Device
 
 	}
 
-	struct Unused
+	namespace Unused
 	{
-		static constexpr uint8_t Pins[] = { D7, D8, D9, D10 };
+		static constexpr uint8_t Pins[] = { D7, D8, D9, D10, LED_BUILTIN };
 	};
 };
 

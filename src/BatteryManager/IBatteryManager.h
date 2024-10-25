@@ -4,18 +4,19 @@
 #define _I_BATTERY_MANAGER_h
 
 #include "BatteryState.h"
+#include "ISleep.h"
 
 namespace BatteryManager
 {
 	/// <summary>
 	/// Class interface for BMS.
 	/// </summary>
-	class IBatteryManager
+	class IBatteryManager : public virtual BatteryManager::ISleep
 	{
 	public:
-		virtual void GetBatteryState(BatteryStateStruct& batteryState) {};
-		virtual void Start() {};
-		virtual void Stop() {};
+		virtual void GetBatteryState(BatteryStateStruct& batteryState) {}
+		virtual void Start() {}
+		virtual void Stop() {}
 	};
 }
 #endif

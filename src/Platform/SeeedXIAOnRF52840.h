@@ -3,10 +3,14 @@
 #ifndef _SEED_XIAO_NRF52840_h
 #define _SEED_XIAO_NRF52840_h
 
-#include <Arduino.h>
 
 #if defined(ARDUINO_Seeed_XIAO_nRF52840_Sense) || defined(ARDUINO_Seeed_XIAO_nRF52840)
 #include <variant.h>
+
+#include <Adafruit_LittleFS.h>
+#include <InternalFileSystem.h>
+#include <bluefruit.h>
+
 namespace SeeedXIAOnRF52840
 {
 	/// <summary>
@@ -14,11 +18,11 @@ namespace SeeedXIAOnRF52840
 	/// </summary>
 	namespace Led
 	{
-		struct Pin
+		enum class Pin : uint8_t
 		{
-			static constexpr uint8_t Red = LED_RED; // D11 is P0.26 (LED RED)
-			static constexpr uint8_t Green = LED_GREEN; // D13 is P0.30 (LED GREEN)
-			static constexpr uint8_t Blue = LED_BLUE; // D12 is P0.06 (LED BLUE)
+			Red = LED_RED, // D11 is P0.26 (LED RED)
+			Green = LED_GREEN, // D13 is P0.30 (LED GREEN)
+			Blue = LED_BLUE // D12 is P0.06 (LED BLUE)
 		};
 
 		static constexpr bool OnState = LOW;
@@ -29,31 +33,31 @@ namespace SeeedXIAOnRF52840
 	/// </summary>
 	namespace BMS
 	{
-		struct Pin
+		enum class Pin : uint8_t
 		{
 			/// <summary>
 			/// Output LOW to enable reading of the BAT voltage.
 			/// D14 is P0.14 (READ_BAT) 
 			/// </summary>
-			static constexpr uint8_t EnablePin = VBAT_ENABLE;
+			Enable = VBAT_ENABLE,
 
 			/// <summary>
 			/// Read the BAT voltage.
 			/// D32 is P0.31 (VBAT)
 			/// </summary>
-			static constexpr uint8_t VInPin = PIN_VBAT;
+			VIn = PIN_VBAT,
 
 			/// <summary>
 			/// Battery Charging current:sswitch between 50/100 mA chargin current.
 			/// The low current charging current is at the input model set up as HIGH LEVEL and the high current charging current is at the output model set up as LOW LEVEL.
 			/// D22 is P0.13 (HICHG)
 			/// </summary>
-			static constexpr uint8_t ChargeCurrentPin = PIN_CHARGING_CURRENT;
+			ChargeCurrent = PIN_CHARGING_CURRENT,
 
 			/// <summary>
 			/// D23 is P0.17 (~CHG)
 			/// </summary>
-			static constexpr uint8_t ChargingPin = 23;
+			Charging = 23
 		};
 
 		struct Bq25100Calibration

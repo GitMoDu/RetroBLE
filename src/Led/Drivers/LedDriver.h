@@ -23,21 +23,21 @@ public:
 
 	void Setup()
 	{
-		pinMode(Pin::Red, OUTPUT);
-		digitalWrite(Pin::Red, HIGH);
+		pinMode((uint8_t)Pin::Red, OUTPUT);
+		digitalWrite((uint8_t)Pin::Red, IoState(false));
 
-		pinMode(Pin::Green, OUTPUT);
-		digitalWrite(Pin::Blue, HIGH);
+		pinMode((uint8_t)Pin::Green, OUTPUT);
+		digitalWrite((uint8_t)Pin::Blue, IoState(false));
 
-		pinMode(Pin::Blue, OUTPUT);
-		digitalWrite(Pin::Green, HIGH);
+		pinMode((uint8_t)Pin::Blue, OUTPUT);
+		digitalWrite((uint8_t)Pin::Green, IoState(false));
 	}
 
 	virtual void SetRGB(const bool red, const bool green, const bool blue) final
 	{
-		digitalWrite(Pin::Red, IoState(red));
-		digitalWrite(Pin::Green, IoState(green));
-		digitalWrite(Pin::Blue, IoState(blue));
+		digitalWrite((uint8_t)Pin::Red, IoState(red));
+		digitalWrite((uint8_t)Pin::Green, IoState(green));
+		digitalWrite((uint8_t)Pin::Blue, IoState(blue));
 	}
 
 private:

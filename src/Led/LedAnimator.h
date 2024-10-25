@@ -3,7 +3,7 @@
 #ifndef _LED_ANIMATOR_h
 #define _LED_ANIMATOR_h
 
-#define _TASK_OO_CALLBACKS
+#if defined(_TASK_OO_CALLBACKS)
 #include <TaskSchedulerDeclarations.h>
 
 #include "ILedDriver.h"
@@ -23,7 +23,7 @@ public:
 	};
 
 private:
-	static constexpr uint32_t BLE_SEARCHING_ANIMATE_PERIOD = 250;
+	static constexpr uint32_t BLE_SEARCHING_ANIMATE_PERIOD = 250 / 2;
 
 private:
 	ILedDriver* LedDriver;
@@ -66,7 +66,7 @@ public:
 		LedDriver->SetRGB(false, false, false);
 	}
 
-	virtual void SetDrawMode(const ConnectionLights connectionState, const bool charging = false)
+	virtual void SetDrawMode(const ConnectionLights connectionState, const bool charging)
 	{
 		if (DrawState.ConnectionState != connectionState)
 		{
@@ -102,7 +102,10 @@ public:
 			TS::Task::disable();
 			break;
 		case ConnectionLights::Usb:
-			green = true;
+			if (!red)
+			{
+				green = true;
+			}
 			TS::Task::disable();
 			break;
 		case ConnectionLights::Searching:
@@ -118,6 +121,5 @@ public:
 		return true;
 	}
 };
-
-
+#endif
 #endif

@@ -21,7 +21,10 @@ private:
 
 public:
 	UsbHidGamepad()
-		: HidInstance(RetroBle::UsbConfig::Descriptor::HidGamePad, sizeof(RetroBle::UsbConfig::Descriptor::HidGamePad), HID_ITF_PROTOCOL_NONE, 2, false)
+		: HidInstance(
+			RetroBle::UsbConfig::Descriptor::HidGamePad, sizeof(RetroBle::UsbConfig::Descriptor::HidGamePad),
+			HID_ITF_PROTOCOL_NONE, 
+			4, true)
 	{}
 
 	void Setup(const char* description,
@@ -29,9 +32,6 @@ public:
 		void (*onSetReportInterrupt)(uint8_t report_id, hid_report_type_t report_type, uint8_t const* buffer, uint16_t bufsize) = nullptr)
 	{
 		HidInstance.setStringDescriptor(description);
-
-		// TODO: find string size from null terminator.
-		HidInstance.getInterfaceDescriptor(0, (uint8_t*)description, 16);
 
 		if (onGetReportInterrupt != nullptr
 			&& onSetReportInterrupt != nullptr)

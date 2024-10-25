@@ -3,8 +3,8 @@
 #ifndef _BQ_25100_DRIVER_h
 #define _BQ_25100_DRIVER_h
 
-#define _TASK_OO_CALLBACKS
-#include <TaskSchedulerDeclarations.h>
+#if defined(_TASK_OO_CALLBACKS)
+#include <TSchedulerDeclarations.hpp>
 
 #include <Arduino.h>
 
@@ -62,7 +62,6 @@ public:
 
 	virtual void Stop() final
 	{
-		Setup();
 		DisableProbe();
 		TS::Task::disable();
 	}
@@ -70,15 +69,16 @@ public:
 	void Setup()
 	{
 		// Setup read pins.
-		pinMode(Pin::VInPin, INPUT);
-		pinMode(Pin::ChargingPin, INPUT);
+		pinMode((uint8_t)Pin::VIn, INPUT);
+		pinMode((uint8_t)Pin::Charging, INPUT);
 
 		// Disable reading of the BAT voltage.
-		pinMode(Pin::EnablePin, OUTPUT);
-		digitalWrite(Pin::EnablePin, HIGH);
+		digitalWrite((uint8_t)Pin::Enable, LOW);
+		pinMode((uint8_t)Pin::Enable, INPUT);
 
-		// Set to slow charge current.
-		pinMode(Pin::ChargeCurrentPin, INPUT);
+		// Set 100mA charge current.
+		pinMode((uint8_t)Pin::ChargeCurrent, OUTPUT);
+		pinMode((uint8_t)Pin::ChargeCurrent, HIGH);
 
 		// Clear history.
 		Average.Clear();
@@ -87,31 +87,56 @@ public:
 		Charging = false;
 	}
 
+	/// <summary>
+	/// Wake on battery charging state change.
+	/// </summary>
+	/// <returns>False if sleep isn't possible right now.</returns>
+	virtual const bool WakeOnInterrupt() final
+	{
+		if (Charging == !digitalRead((uint8_t)Pin::Charging))
+		{
+#if defined(ARDUINO_Seeed_XIAO_nRF52840_Sense) || defined(ARDUINO_Seeed_XIAO_nRF52840)
+			if (Charging)
+			{
+				pinMode((uint8_t)Pin::Charging, INPUT_SENSE_HIGH);// Wakes up when externally connected to 3.3V.
+			}
+			else
+			{
+				pinMode((uint8_t)Pin::Charging, INPUT_SENSE_LOW);	// Wakes up when externally connected to ground.
+			}
+
+#else
+			pinMode((uint8_t)Pin::Charging, INPUT);
+#endif
+			return true;
+		}
+
+		return false;
+	}
+
+	virtual void OnWakeUp() final
+	{
+		pinMode((uint8_t)Pin::Charging, INPUT);
+		Task::delay(0);
+	}
+
 	virtual void GetBatteryState(BatteryManager::BatteryStateStruct& batteryState) final
 	{
+		Charging = !digitalRead((uint8_t)Pin::Charging);
+
 		batteryState.ChargeLevel = GetBatteryChargeLevel(Average.GetAverage());
 		batteryState.Charging = Charging;
 	}
 
 	virtual bool Callback() final
 	{
-		// Only enable level check if NOT charging.
-		if (!digitalRead(Pin::ChargingPin))
-		{
-			if (!Charging)
-			{
-				Charging = true;
-			}
+		Charging = !digitalRead((uint8_t)Pin::Charging);
 
-			Average.Step(GetBatteryVoltage());
-		}
-		else
+		// Only enable level check if NOT charging.
+		if (!Charging)
 		{
-			if (Charging)
-			{
-				Charging = false;
-				Average.Clear();
-			}
+			Average.Step(GetBatteryVoltage());
+			Average.Clear();
 		}
 
 		return true;
@@ -140,6 +165,8 @@ private:
 
 #if defined(ARDUINO_Seeed_XIAO_nRF52840_Sense) || defined(ARDUINO_Seeed_XIAO_nRF52840)
 	/// <summary>
+	/// TODO: Crashing/Not working.
+	/// 
 	/// ADC voltage read for Seeed Xiao nRF52840.
 	/// https://wiki.seeedstudio.com/XIAO_BLE#q3-what-are-the-considerations-when-using-xiao-nrf52840-sense-for-battery-charging
 	/// https://wiki.seeedstudio.com/XIAO_BLE#battery-charging-current
@@ -159,7 +186,7 @@ private:
 
 		EnableProbe();
 		delayMicroseconds(Calibration::AdcSettleMicros); // Let the ADC settle just a bit.
-		adc = analogRead(Pin::VInPin);
+		adc = analogRead((uint8_t)Pin::VIn);
 		DisableProbe();
 
 		// Set the ADC back to the default settings
@@ -179,7 +206,7 @@ private:
 
 		EnableProbe();
 		delayMicroseconds(Calibration::AdcSettleMicros); // Let the ADC settle just a bit.
-		adc = analogRead(Pin::VInPin);
+		adc = analogRead((uint8_t)Pin::VIn);
 		DisableProbe();
 
 		return GetVoltageFromAdc(adc);
@@ -194,13 +221,14 @@ private:
 
 	void DisableProbe()
 	{
-		pinMode(Pin::EnablePin, INPUT);
+		pinMode((uint8_t)Pin::Enable, INPUT);
 	}
 
 	void EnableProbe()
 	{
-		pinMode(Pin::EnablePin, OUTPUT);
-		digitalWrite(Pin::EnablePin, LOW);
+		pinMode((uint8_t)Pin::Enable, OUTPUT);
+		digitalWrite((uint8_t)Pin::Enable, LOW);
 	}
 };
+#endif
 #endif

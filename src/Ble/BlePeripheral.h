@@ -1,7 +1,7 @@
-// RetroBleBluefruit.h
+// BlePeripheral.h
 
-#ifndef _RETRO_BLE_BLUEFRUIT_h
-#define _RETRO_BLE_BLUEFRUIT_h
+#ifndef _BLE_PERIPHERAL_h
+#define _BLE_PERIPHERAL_h
 
 #include <Adafruit_LittleFS.h>
 #include <InternalFileSystem.h>
@@ -47,17 +47,18 @@ public:
 		void (*onAdvertiseStop)(),
 		void (*onBleEvent)(ble_evt_t* bleEvent),
 		const RetroBle::BleConfig::Appearance appearance,
-		const char* name = "Experimental",
-		const char* model = "v0")
+		const char* name,
+		const char* version)
 	{
 		// Setup BLE and advertising service.
-		SetupBle(onConnect, onDisconnect, onBleEvent, name, model, RetroBle::BleConfig::TxPower);
-		SetupAdvertisement(deviceService, onAdvertiseStop, (uint16_t)appearance);
+		SetupBle(onConnect, onDisconnect, onBleEvent, name, version, RetroBle::BleConfig::TxPower);
 
 		// Start all services.
 		BleDiscovery.begin();
 		BleBattery.begin();
 		deviceService.begin();
+
+		SetupAdvertisement(deviceService, onAdvertiseStop, (uint16_t)appearance);
 	}
 
 	void SetBleListener(IBleListener* listener)
@@ -82,12 +83,12 @@ public:
 
 	void Stop()
 	{
+		Bluefruit.Advertising.stop();
+
 		if (IsConnected())
 		{
 			Bluefruit.disconnect(Handle);
 		}
-
-		Bluefruit.Advertising.stop();
 	}
 
 	/// <summary>
@@ -98,7 +99,7 @@ public:
 	{
 		if (IsConnected())
 		{
-			BleBattery.notify(chargePercentage);
+			BleBattery.write(chargePercentage);
 		}
 	}
 
@@ -138,14 +139,6 @@ public:
 		}
 	}
 
-	void OnAdvertiseStopInterrupt()
-	{
-		if (Listener != nullptr)
-		{
-			Listener->OnBleStateChange();
-		}
-	}
-
 	void OnBleEventInterrupt(ble_evt_t* bleEvent)
 	{
 		//TODO: Forward event to relevant listener.
@@ -157,22 +150,25 @@ private:
 		void (*onDisconnect)(const uint16_t conn_hdl, const uint8_t reason),
 		void (*onBleEvent)(ble_evt_t* bleEvent),
 		const char* name,
-		const char* model,
+		const char* version,
 		const int8_t txPower)
 	{
 		// Init Bluefruit
 		Bluefruit.begin();
 		Bluefruit.setTxPower(txPower);
-
 		Bluefruit.setName(name);
 
 		// Disable automatic LED handling.
 		Bluefruit.autoConnLed(false);
 		Bluefruit.setConnLedInterval(UINT32_MAX);
 
+		// Set event callback listener.
+		Bluefruit.setEventCallback(onBleEvent);
+
 		// Configure and Start Device Information Service
 		BleDiscovery.setManufacturer(RetroBle::Device::Manufacturer);
-		BleDiscovery.setModel(model);
+		BleDiscovery.setModel(name);
+		BleDiscovery.setSoftwareRev(version);
 
 		// Set connection interval (i.e. poll rate).
 		Bluefruit.Periph.setConnInterval(RetroBle::BleConfig::ConnectionInterval::Min, RetroBle::BleConfig::ConnectionInterval::Max);
@@ -181,8 +177,7 @@ private:
 		Bluefruit.Periph.setConnectCallback(onConnect);
 		Bluefruit.Periph.setDisconnectCallback(onDisconnect);
 
-		// Set event callback listener.
-		Bluefruit.setEventCallback(onBleEvent);
+		Bluefruit.ScanResponse.addName();
 	}
 
 	void SetupAdvertisement(BLEService& deviceService, void (*onAdvertiseStop)(), const uint16_t appearance)

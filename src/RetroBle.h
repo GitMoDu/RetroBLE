@@ -31,4 +31,9 @@
 
 #include "Usb/UsbHidGamepad.h"
 
+#include "HidDevice/HidGamepadTask.h"
+
+#include "Framework/UsbBleCoordinator.h"
+
+
 #endif

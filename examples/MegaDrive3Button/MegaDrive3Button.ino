@@ -16,24 +16,22 @@
 //#define DEBUG
 
 #define _TASK_OO_CALLBACKS
-#define _TASK_SLEEP_ON_IDLE_RUN
-#include <TScheduler.hpp>
+//#define _TASK_SLEEP_ON_IDLE_RUN
 
-#include <Adafruit_LittleFS.h>
-#include <InternalFileSystem.h>
-#include <bluefruit.h>
+//#include <Adafruit_LittleFS.h>
+//#include <InternalFileSystem.h>
+//#include <bluefruit.h>
+
+#include <TScheduler.hpp>
 
 
 #include <Arduino.h>
 #include <RetroBle.h>
+
 #include "Device.h"
 
-#include "MegaDriveVirtualPadWriter.h"
-#include "BlePadMapper.h"
-#include "UsbPadMapper.h"
-
-#include "Maestro.h"
-
+#include "MegaDriveSleepyPad.h"
+#include "MegaDriveMapperTask.h"
 
 // Process scheduler.
 TS::Scheduler SchedulerBase;
@@ -44,39 +42,37 @@ TS::Scheduler SchedulerBase;
 LedDriver<Device::Led::Pin, Device::Led::OnState> Led{};
 
 // Driver for onboard battery manager.
-Bq25100Driver < Device::BMS::UpdatePeriodMillis,
+Bq25100Driver <Device::BMS::UpdatePeriodMillis,
 	Device::BMS::HistorySize,
 	Device::BMS::Pin,
 	Device::BMS::Calibration> BMS(SchedulerBase);
 
-// Mega Driver Controller reader.
-using MegaDriveVirtualPadType = MegaDriveVirtualPadWriter<Device::MegaDriveController::Pin>;
-MegaDriveVirtualPadType MegaDriveVirtualPadWrite{};
-//
+// USB driver.
+UsbHidGamepad UsbGamepad{};
+UsbPeripheral UsbDev{};
 
 // Bluetooth driver.
 BLEHidGamepad BleGamepad{};
 BlePeripheral BleDev{};
-//
 
-//
-UsbHidGamepad UsbGamepad{};
-UsbPeripheral UsbDev{};
+// Mega Driver Controller driver.
+using MegaDriveVirtualPadType = MegaDriveSleepyPad<Device::MegaDriveController::Pin, Device::MegaDriveController::WakePin>;
+MegaDriveVirtualPadType MegaDriveVirtualPadWrite{};
 //
 
 //// SOFTWARE TASKS
 // Pad read and notify task.
-using UsbMapperType = UsbPadMapperTask<MegaDriveVirtualPadType, Device::USB::UpdatePeriodMillis>;
-UsbMapperType UsbPadMapper(SchedulerBase, MegaDriveVirtualPadWrite, UsbDev, UsbGamepad);
-
-using BlePadMapperType = BlePadMapperTask<MegaDriveVirtualPadType, Device::BLE::UpdatePeriodMillis>;
-BlePadMapperType BlePadMapper(SchedulerBase, MegaDriveVirtualPadWrite, BleGamepad);
+MegaDriveMapperTask<MegaDriveVirtualPadType, Device::BLE::LONG_PRESS_POWER_OFF_PERIOD_MILLIS>GamepadMapper(
+	SchedulerBase,
+	MegaDriveVirtualPadWrite,
+	UsbGamepad, BleGamepad,
+	Device::USB::UpdatePeriodMillis, Device::BLE::UpdatePeriodMillis);
 
 // LED animation task.
 LedAnimatorTask PadLights(SchedulerBase, &Led);
 
 // Coordinator task.
-MaestroTask<UsbMapperType, BlePadMapperType> Maestro(SchedulerBase, &BMS, PadLights, UsbDev, UsbPadMapper, BleDev, BlePadMapper);
+UsbBleCoordinator Coordinator(SchedulerBase, &BMS, PadLights, &GamepadMapper, UsbDev, BleDev);
 //
 
 void setup()
@@ -86,26 +82,29 @@ void setup()
 
 	// Blocking wait for connection when debug mode is enabled via IDE
 	while (!Serial) delay(10);
+
+	Serial.println(F("MegaDrive start"));
 #endif
 
 	// Disable unused pins.
 	PinSetup();
 
-	// Battery management pin setup.
+	// Battery management setup.
 	BMS.Setup();
 
-	// Onboard LED pin setup.
+	// Onboard LED setup.
 	Led.Setup();
 
-	// Setup controller pins.
-	MegaDriveVirtualPadWrite.Setup();
+	// Setup controller driver.
+	MegaDriveVirtualPadWrite.Setup(OnButtonInterrupt);
 
 	// BLE setup.
 	BleDev.Setup(BleGamepad,
 		connect_callback, disconnect_callback,
 		advertise_stop_callback, ble_event_callback,
 		Device::BLE::Appearance,
-		Device::Name, Device::Version::Name);
+		Device::Name,
+		Device::Version::Name);
 
 	// USB setup.
 	UsbDev.Setup(Device::Name, Device::Version::Code,
@@ -113,11 +112,11 @@ void setup()
 		Device::USB::ProductId);
 	UsbGamepad.Setup(Device::Name, get_report_callback, set_report_callback);
 
-	//TODO:
-	//UsbGamepad.SetUsbListener();
-
-	// Start Maestro, the device coordinator.
-	Maestro.Start();
+	// Start the device coordinator.
+	if (!Coordinator.Start())
+	{
+		Serial.println(F("Error starting coordinator."));
+	}
 }
 
 void loop()
@@ -129,7 +128,9 @@ void PinSetup()
 {
 	for (uint8_t i = 0; i < sizeof(Device::Unused::Pins); i++)
 	{
-		pinMode(Device::Unused::Pins[i], INPUT);
+		const uint8_t pin = Device::Unused::Pins[i];
+		pinMode(pin, INPUT);
+		digitalWrite(pin, LOW);
 	}
 }
 
@@ -140,9 +141,7 @@ void ble_event_callback(ble_evt_t* bleEvent)
 }
 
 void advertise_stop_callback()
-{
-	BleDev.OnAdvertiseStopInterrupt();
-}
+{}
 
 void disconnect_callback(uint16_t conn_handle, uint8_t reason)
 {
@@ -162,4 +161,9 @@ uint16_t get_report_callback(uint8_t report_id, hid_report_type_t report_type, u
 void set_report_callback(uint8_t report_id, hid_report_type_t report_type, uint8_t const* buffer, uint16_t bufsize)
 {
 	UsbGamepad.OnSetReportInterrupt(report_id, report_type, buffer, bufsize);
+}
+
+void OnButtonInterrupt()
+{
+	GamepadMapper.OnWakeInterrupt();
 }
