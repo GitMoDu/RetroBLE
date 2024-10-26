@@ -29,6 +29,7 @@
 #include "Ble/IBleListener.h"
 #include "Ble/BleConfig.h"
 #include "Ble/BlePeripheral.h"
+#include "Ble/BleCentral.h"
 
 #include "Usb/IUsbListener.h"
 #include "Usb/UsbConfig.h"
@@ -39,6 +40,8 @@
 
 #include "HidDevice/HidGamepadTask.h"
 #include "HidDevice/HidKeyboardTask.h"
+
+#include "HidHost/HidToVirtualPad.h"
 
 #include "Framework/UsbBleCoordinator.h"
 
