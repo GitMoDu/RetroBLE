@@ -14,8 +14,8 @@ private:
 	ButtonParser::ActionTimed StartHold{};
 
 private:
-	PadState SleepControllerState{};
-	PadState WakeControllerState{};
+	virtual_pad_state_t SleepControllerState{};
+	virtual_pad_state_t WakeControllerState{};
 
 public:
 	MegaDriveMapperTask(TS::Scheduler& scheduler,
