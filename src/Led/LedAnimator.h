@@ -30,6 +30,7 @@ private:
 
 private:
 	uint32_t AnimationStart = 0;
+	const uint32_t UpdatePeriod;
 
 	struct DrawStateStruct
 	{
@@ -41,8 +42,9 @@ public:
 	LedAnimatorTask(TS::Scheduler& scheduler,
 		ILedDriver* ledDriver,
 		const uint32_t updatePeriod = 5)
-		: TS::Task(updatePeriod, TASK_FOREVER, &scheduler, false)
+		: TS::Task(TASK_IMMEDIATE, TASK_FOREVER, &scheduler, false)
 		, LedDriver(ledDriver)
+		, UpdatePeriod(updatePeriod)
 	{}
 
 	void Start()
@@ -75,13 +77,33 @@ public:
 
 		DrawState.Charging = charging;
 		DrawState.ConnectionState = connectionState;
+		UpdateLedState();
 
-		TS::Task::enable();
-
-		LedDriver->SetRGB(DrawState.Charging, false, false);
+		TS::Task::enableIfNot();
 	}
 
 	virtual bool Callback() final
+	{
+		UpdateLedState();
+
+		switch (DrawState.ConnectionState)
+		{
+		case ConnectionLights::Off:
+			TS::Task::disable();
+			break;
+		case ConnectionLights::Ble:
+		case ConnectionLights::Usb:
+		case ConnectionLights::Searching:
+			TS::Task::delay(UpdatePeriod);
+		default:
+			break;
+		}
+
+		return true;
+	}
+
+private:
+	void UpdateLedState()
 	{
 		const uint32_t timestamp = millis();
 		const uint32_t elapsed = timestamp - AnimationStart;
@@ -95,18 +117,15 @@ public:
 		switch (DrawState.ConnectionState)
 		{
 		case ConnectionLights::Off:
-			TS::Task::disable();
 			break;
 		case ConnectionLights::Ble:
 			blue = true;
-			TS::Task::disable();
 			break;
 		case ConnectionLights::Usb:
 			if (!red)
 			{
 				green = true;
 			}
-			TS::Task::disable();
 			break;
 		case ConnectionLights::Searching:
 			blue = (elapsed % (BLE_SEARCHING_ANIMATE_PERIOD * 2)) <= BLE_SEARCHING_ANIMATE_PERIOD;
@@ -117,8 +136,6 @@ public:
 
 		// Write the RGB state to the LED Driver.
 		LedDriver->SetRGB(red, green, blue);
-
-		return true;
 	}
 };
 #endif
