@@ -36,7 +36,7 @@ public:
 		}
 	}
 
-	const uint16_t GetAverage()
+	const uint16_t GetAverage() const
 	{
 		uint32_t sum = 0;
 		for (size_t i = 0; i < HistorySize; i++)
