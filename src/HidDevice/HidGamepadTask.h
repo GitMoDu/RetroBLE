@@ -29,7 +29,6 @@ private:
 	BLEHidGamepad& BleGamepad;
 
 private:
-	const uint32_t UsbPeriod;
 	const uint32_t BlePeriod;
 
 private:
@@ -37,7 +36,6 @@ private:
 	hid_gamepad_report_t LastHidReport{};
 
 private:
-	//void (*WakeInterrupt)() = nullptr;
 	uint32_t LastActivity = 0;
 	TargetEnum Target = TargetEnum::None;
 
@@ -67,7 +65,6 @@ public:
 		, TS::Task(TASK_IMMEDIATE, TASK_FOREVER, &scheduler, false)
 		, UsbGamepad(usbGamepad)
 		, BleGamepad(bleGamepad)
-		, UsbPeriod(usbUpdatePeriod)
 		, BlePeriod(bleUpdatePeriod)
 	{}
 
@@ -87,7 +84,7 @@ public:
 			{
 				UsbGamepad.NotifyGamepad(HidReport);
 			}
-			TS::Task::delay(UsbPeriod);
+			TS::Task::delay(0);
 			break;
 		case TargetEnum::Ble:
 			BleGamepad.report(&HidReport);
@@ -130,22 +127,6 @@ protected:
 	{
 		LastActivity = millis();
 	}
-
-//private:
-//	void ResetReports()
-//	{
-//		HidReport.buttons = 0;
-//		HidReport.hat = 0;
-//		HidReport.x = 0;
-//		HidReport.y = 0;
-//		HidReport.z = 0;
-//		HidReport.rx = 0;
-//		HidReport.ry = 0;
-//		HidReport.rz = 0;
-//
-//		LastHidReport.buttons = HidReport.buttons;
-//		LastHidReport.hat = HidReport.hat;
-//	}
 };
 #endif
 #endif
