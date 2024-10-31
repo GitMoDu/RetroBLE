@@ -4,7 +4,7 @@
 #define _LED_ANIMATOR_h
 
 #if defined(_TASK_OO_CALLBACKS)
-#include <TaskSchedulerDeclarations.h>
+#include <TSchedulerDeclarations.hpp>
 
 #include "IIndicator.h"
 #include "ILedDriver.h"
