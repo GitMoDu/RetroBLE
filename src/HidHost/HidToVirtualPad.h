@@ -17,24 +17,33 @@ enum class HidMapTypeEnum : uint16_t
 	GenericGamepad = 0
 };
 
+/// <summary>
+/// HID source controller, mapped to Virtual Pad.
+/// </summary>
 class HidToVirtualPad : public virtual IHidListener, public WriteVirtualPad
 {
-private:
-	static constexpr uint16_t Features = FeatureFlags::GetFlags<
-		FeaturesEnum::DPad,
-		FeaturesEnum::Joy1,
-		FeaturesEnum::Joy2,
-		FeaturesEnum::A, FeaturesEnum::B,
-		FeaturesEnum::X, FeaturesEnum::Y,
-		FeaturesEnum::L1, FeaturesEnum::R1,
-		FeaturesEnum::L2, FeaturesEnum::R2,
-		FeaturesEnum::L3, FeaturesEnum::R3>();
+public:
+	static constexpr uint32_t ConfigurationCode =
+		VirtualPadConfiguration::GetConfigurationCode(
+			VirtualPadConfiguration::GetFeatureFlags<FeaturesEnum::DPad,
+			FeaturesEnum::Joy1,
+			FeaturesEnum::Joy2,
+			FeaturesEnum::Start, FeaturesEnum::Select,
+			FeaturesEnum::Home, FeaturesEnum::Share,
+			FeaturesEnum::A, FeaturesEnum::B, FeaturesEnum::X, FeaturesEnum::Y,
+			FeaturesEnum::L1, FeaturesEnum::R1,
+			FeaturesEnum::L2, FeaturesEnum::R2,
+			FeaturesEnum::L3, FeaturesEnum::R3 >(),
+			VirtualPadConfiguration::NoProperties,
+			NavigationEnum::AB);
 
+private:
 	static constexpr uint32_t NO_UPDATE_TIMEOUT = 3 * 1000;
 
 public:
-	HidToVirtualPad()
-		: WriteVirtualPad(Features)
+	HidToVirtualPad() 
+		: IHidListener()
+		, WriteVirtualPad(ConfigurationCode)
 	{}
 
 public:
@@ -65,7 +74,7 @@ public:
 			if (LastUuid != uuid)
 			{
 				LastUuid = uuid;
-				Serial.print(F("\tConnected to \t"));
+				Serial.print(F("\tProfile switched to \t"));
 				Serial.println(uuid);
 			}
 #endif
@@ -156,7 +165,7 @@ private:
 
 #if defined(DEBUG)
 public:
-	void LogControllerState()
+	void LogState()
 	{
 		if (Connected())
 		{
@@ -353,6 +362,149 @@ public:
 				Serial.print(F("R2\t"));
 				Serial.println(R2());
 			}
+		}
+	}
+
+	void LogFeatures()
+	{
+		Serial.println(F("Features: "));
+
+		if (FeatureStart() || FeatureSelect() || FeatureHome() || FeatureShare())
+		{
+			Serial.print(F("\tMenu Buttons: "));
+			if (FeatureStart()) { Serial.print(F("Start ")); }
+			if (FeatureSelect()) { Serial.print(F("Select ")); }
+			if (FeatureHome()) { Serial.print(F("Home ")); }
+			if (FeatureShare()) { Serial.print(F("Share ")); }
+			Serial.println();
+		}
+		else
+		{
+			Serial.println(F("\tNo Menu buttons"));
+		}
+
+		if (FeatureJoy1() || FeatureJoy2())
+		{
+			Serial.print(F("\tJoysticks: "));
+			if (FeatureJoy1()) { Serial.print(F("Joy1 ")); }
+			if (FeatureJoy2()) { Serial.print(F("Joy2 ")); }
+			Serial.println();
+		}
+		else
+		{
+			Serial.println(F("\tNo Joysticks"));
+		}
+
+		if (FeatureDPad())
+		{
+			Serial.print(F("\tDpad"));
+		}
+		else
+		{
+			Serial.print(F("\tNo DPad"));
+		}
+		Serial.println();
+
+		if (FeatureA() || FeatureB() || FeatureX() || FeatureY())
+		{
+			Serial.print(F("\tFace Buttons: "));
+			if (FeatureA()) { Serial.print(F("A ")); }
+			if (FeatureB()) { Serial.print(F("B ")); }
+			if (FeatureX()) { Serial.print(F("X ")); }
+			if (FeatureY()) { Serial.print(F("Y ")); }
+			Serial.println();
+		}
+		else
+		{
+			Serial.println(F("\tNo Face buttons"));
+		}
+
+		if (FeatureL2() || FeatureR2())
+		{
+			Serial.print(F("\tJoystick Buttons: "));
+			if (FeatureL3()) { Serial.print(F("L3 ")); }
+			if (FeatureR3()) { Serial.print(F("R3 ")); }
+			Serial.println();
+		}
+		else
+		{
+			Serial.println(F("\tNo Joystick buttons"));
+		}
+
+		if (FeatureL1() || FeatureR1())
+		{
+			Serial.print(F("\tShoulder buttons: "));
+			if (FeatureL1()) { Serial.print(F("L1 ")); }
+			if (FeatureR1()) { Serial.print(F("R1 ")); }
+			Serial.println();
+		}
+		else
+		{
+			Serial.println(F("\tNo Shoulder buttons"));
+		}
+
+		if (FeatureL2() || FeatureR2())
+		{
+			Serial.print(F("\tTriggers: "));
+			if (FeatureL2()) { Serial.print(F("L2 ")); }
+			if (FeatureR2()) { Serial.print(F("R2 ")); }
+			Serial.println();
+		}
+		else
+		{
+			Serial.println(F("\tNo triggers"));
+		}
+		Serial.println();
+	}
+
+	void LogPropertiesNavigation()
+	{
+		Serial.println(F("Properties: "));
+		if (PropertyJoy1Digital())
+		{
+			Serial.println(F("\tJoy1 is Digital"));
+		}
+
+		if (PropertyJoy2Digital())
+		{
+			Serial.println(F("\tJoy2 is Digital"));
+		}
+
+		if (PropertyL2R2Digital())
+		{
+			Serial.println(F("\tL1 and R1 are Digital"));
+		}
+
+		Serial.println();
+
+		Serial.println(F("Navigation: "));
+		switch (VirtualPadConfiguration::GetNavigation(ConfigurationCode))
+		{
+		case NavigationEnum::BA:
+			Serial.println(F("BA"));
+			break;
+		case NavigationEnum::XA:
+			Serial.println(F("XA"));
+			break;
+		case NavigationEnum::BY:
+			Serial.println(F("BY"));
+			break;
+		case NavigationEnum::AY:
+			Serial.println(F("AY"));
+			break;
+		case NavigationEnum::BX:
+			Serial.println(F("BX"));
+			break;
+		case NavigationEnum::AX:
+			Serial.println(F("AX"));
+			break;
+		case NavigationEnum::XB:
+			Serial.println(F("XB"));
+			break;
+		default:
+		case NavigationEnum::AB:
+			Serial.println(F("AB"));
+			break;
 		}
 	}
 #endif
