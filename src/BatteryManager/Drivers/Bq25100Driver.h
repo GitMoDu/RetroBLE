@@ -53,12 +53,12 @@ public:
 		, TS::Task(UpdatePeriod, TASK_FOREVER, &scheduler, false)
 	{}
 
-	virtual void Start() final
+	void Start()
 	{
 		TS::Task::enable();
 	}
 
-	virtual void Stop() final
+	void Stop()
 	{
 		DisableProbe();
 		TS::Task::disable();
@@ -161,10 +161,12 @@ private:
 		{
 			if (batteryVoltage >= Calibration::VMaxCharging)
 			{
+				// Keep at 99% until charging stops.
 				return BatteryManager::ChargeLevelMax - 1;
 			}
 			else
 			{
+				// Scale 99% until VMaxCharging.
 				return (((uint32_t)(clipped - Calibration::VMin)) * (BatteryManager::ChargeLevelMax - 1))
 					/ (Calibration::VMaxCharging - Calibration::VMin);
 			}

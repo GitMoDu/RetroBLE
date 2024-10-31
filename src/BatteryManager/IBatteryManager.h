@@ -15,8 +15,6 @@ namespace BatteryManager
 	{
 	public:
 		virtual void GetBatteryState(BatteryStateStruct& batteryState) {}
-		virtual void Start() {}
-		virtual void Stop() {}
 	};
 }
 #endif

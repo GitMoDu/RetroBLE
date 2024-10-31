@@ -7,7 +7,7 @@
 #include <TSchedulerDeclarations.hpp>
 
 #include "../BatteryManager/IBatteryManager.h"
-#include "../Led/LedAnimator.h"
+#include "../Indicator/IIndicator.h"
 
 #include "../Usb/UsbPeripheral.h"
 #include "../Ble/BlePeripheral.h"
@@ -32,8 +32,7 @@ private:
 	BlePeripheral& BleDev;
 
 private:
-	LedAnimatorTask& Lights;
-
+	IIndicator* Lights;
 	IHidDevice* HidMapper;
 	BatteryManager::IBatteryManager* BMS;
 
@@ -45,7 +44,7 @@ private:
 public:
 	UsbBleCoordinator(TS::Scheduler& scheduler,
 		BatteryManager::IBatteryManager* bms,
-		LedAnimatorTask& lights,
+		IIndicator* lights,
 		IHidDevice* hidMapper,
 		UsbPeripheral& usbDevice,
 		BlePeripheral& bleDevice)
@@ -61,6 +60,7 @@ public:
 	const bool Start()
 	{
 		if (BMS != nullptr
+			&& Lights != nullptr
 			&& HidMapper != nullptr)
 		{
 			State = StateEnum::Booting;
@@ -81,14 +81,12 @@ public:
 		case StateEnum::Booting:
 			State = StateEnum::Waking;
 			BatteryState.Charging = false;
-			BMS->Start();
-			Lights.Start();
-			Lights.SetDrawMode(LedAnimatorTask::ConnectionLights::Off, BatteryState.Charging);
+			Lights->SetDrawMode(IIndicator::StateEnum::Off, BatteryState.Charging);
 			TS::Task::delay(0);
 			break;
 		case StateEnum::Waking:
 			BMS->GetBatteryState(BatteryState);
-			Lights.SetDrawMode(LedAnimatorTask::ConnectionLights::Off, BatteryState.Charging);
+			Lights->SetDrawMode(IIndicator::StateEnum::Off, BatteryState.Charging);
 			if (UsbDev.IsConnected())
 			{
 				HidMapper->SetTarget(IHidDevice::TargetEnum::Usb);
@@ -115,7 +113,7 @@ public:
 			}
 			else if (BleDev.IsConnected()) // BLE connected.
 			{
-				Lights.SetDrawMode(LedAnimatorTask::ConnectionLights::Ble, BatteryState.Charging);
+				Lights->SetDrawMode(IIndicator::StateEnum::Ble, BatteryState.Charging);
 				HidMapper->SetTarget(IHidDevice::TargetEnum::Ble);
 				BleStart = millis();
 				TS::Task::delay(0);
@@ -126,7 +124,7 @@ public:
 			{
 				// Keep the lights updated.
 				BMS->GetBatteryState(BatteryState);
-				Lights.SetDrawMode(LedAnimatorTask::ConnectionLights::Searching, BatteryState.Charging);
+				Lights->SetDrawMode(IIndicator::StateEnum::Searching, BatteryState.Charging);
 				TS::Task::delay(RetroBle::BleConfig::BATTERY_UPDATE_PERIOD_MILLIS);
 			}
 			else // Automatic advertising time out.
@@ -148,7 +146,7 @@ public:
 				if (HidMapper->IsPowerDownRequested()) // Long press to shutdown.
 				{
 					BleDev.Stop();
-					Lights.SetDrawMode(LedAnimatorTask::ConnectionLights::Off, BatteryState.Charging);
+					Lights->SetDrawMode(IIndicator::StateEnum::Off, BatteryState.Charging);
 					HidMapper->SetTarget(IHidDevice::TargetEnum::None);
 					State = StateEnum::PowerDown;
 				}
@@ -161,7 +159,7 @@ public:
 				else // No activity time-out or long press to shutdown.
 				{
 					BMS->GetBatteryState(BatteryState);
-					Lights.SetDrawMode(LedAnimatorTask::ConnectionLights::Ble, BatteryState.Charging);
+					Lights->SetDrawMode(IIndicator::StateEnum::Ble, BatteryState.Charging);
 					TS::Task::delay(RetroBle::BleConfig::BATTERY_UPDATE_PERIOD_MILLIS);
 
 					BleDev.NotifyBattery(BatteryManager::ChargeLevelPercent(BatteryState));
@@ -178,7 +176,7 @@ public:
 			if (UsbDev.IsConnected()) // No time-out when connected through USB.
 			{
 				BMS->GetBatteryState(BatteryState);
-				Lights.SetDrawMode(LedAnimatorTask::ConnectionLights::Usb, BatteryState.Charging);
+				Lights->SetDrawMode(IIndicator::StateEnum::Usb, BatteryState.Charging);
 				TS::Task::delay(RetroBle::BleConfig::BATTERY_UPDATE_PERIOD_MILLIS);
 			}
 			else // USB disconnected, restart state.
@@ -211,7 +209,7 @@ public:
 			HidMapper->SetTarget(IHidDevice::TargetEnum::None);
 
 			// Update lights.
-			Lights.SetDrawMode(LedAnimatorTask::ConnectionLights::Off, BatteryState.Charging);
+			Lights->SetDrawMode(IIndicator::StateEnum::Off, BatteryState.Charging);
 
 			///////// Sleep... ////////
 			if (HidMapper->WakeOnInterrupt()

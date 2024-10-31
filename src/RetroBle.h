@@ -12,7 +12,6 @@
 #pragma "Device not supported."
 #endif
 
-
 #include "Framework/RetroBleDevice.h"
 
 #include "BatteryManager/IBatteryManager.h"
@@ -20,11 +19,13 @@
 #include "BatteryManager/Drivers/Bq25100Driver.h"
 
 #include "Led/ILedDriver.h"
-#include "Led/LedAnimator.h"
 #include "Led/Drivers/LedDriver.h"
 
 #include "Lights/ILightsDriver.h"
 #include "Lights/Drivers/Ws2812Driver.h"
+
+#include "Indicator/IIndicator.h"
+#include "Indicator/LedAnimator.h"
 
 #include "Ble/IBleListener.h"
 #include "Ble/BleConfig.h"

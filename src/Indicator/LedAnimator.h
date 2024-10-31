@@ -6,22 +6,14 @@
 #if defined(_TASK_OO_CALLBACKS)
 #include <TaskSchedulerDeclarations.h>
 
+#include "IIndicator.h"
 #include "ILedDriver.h"
 
 /// <summary>
 /// Animates onboard RGB LED according to the GamePad connection, battery level and charge state.
 /// </summary>
-class LedAnimatorTask : private TS::Task
+class LedAnimatorTask : public virtual IIndicator, private TS::Task
 {
-public:
-	enum class ConnectionLights
-	{
-		Off,
-		Ble,
-		Usb,
-		Searching
-	};
-
 private:
 	static constexpr uint32_t BLE_SEARCHING_ANIMATE_PERIOD = 250 / 2;
 
@@ -34,7 +26,7 @@ private:
 
 	struct DrawStateStruct
 	{
-		ConnectionLights ConnectionState = ConnectionLights::Off;
+		IIndicator::StateEnum State = IIndicator::StateEnum::Off;
 		bool Charging = false;
 	} DrawState;
 
@@ -68,15 +60,15 @@ public:
 		LedDriver->SetRGB(false, false, false);
 	}
 
-	virtual void SetDrawMode(const ConnectionLights connectionState, const bool charging)
+	virtual void SetDrawMode(const IIndicator::StateEnum indicatorState, const bool charging) final
 	{
-		if (DrawState.ConnectionState != connectionState)
+		if (DrawState.State != indicatorState)
 		{
 			AnimationStart = millis();
 		}
 
 		DrawState.Charging = charging;
-		DrawState.ConnectionState = connectionState;
+		DrawState.State = indicatorState;
 		UpdateLedState();
 
 		TS::Task::enableIfNot();
@@ -86,14 +78,14 @@ public:
 	{
 		UpdateLedState();
 
-		switch (DrawState.ConnectionState)
+		switch (DrawState.State)
 		{
-		case ConnectionLights::Off:
+		case IIndicator::StateEnum::Off:
 			TS::Task::disable();
 			break;
-		case ConnectionLights::Ble:
-		case ConnectionLights::Usb:
-		case ConnectionLights::Searching:
+		case IIndicator::StateEnum::Ble:
+		case IIndicator::StateEnum::Usb:
+		case IIndicator::StateEnum::Searching:
 			TS::Task::delay(UpdatePeriod);
 		default:
 			break;
@@ -114,20 +106,20 @@ private:
 
 		red = DrawState.Charging;
 
-		switch (DrawState.ConnectionState)
+		switch (DrawState.State)
 		{
-		case ConnectionLights::Off:
+		case IIndicator::StateEnum::Off:
 			break;
-		case ConnectionLights::Ble:
+		case IIndicator::StateEnum::Ble:
 			blue = true;
 			break;
-		case ConnectionLights::Usb:
+		case IIndicator::StateEnum::Usb:
 			if (!red)
 			{
 				green = true;
 			}
 			break;
-		case ConnectionLights::Searching:
+		case IIndicator::StateEnum::Searching:
 			blue = (elapsed % (BLE_SEARCHING_ANIMATE_PERIOD * 2)) <= BLE_SEARCHING_ANIMATE_PERIOD;
 			break;
 		default:
@@ -135,7 +127,10 @@ private:
 		}
 
 		// Write the RGB state to the LED Driver.
-		LedDriver->SetRGB(red, green, blue);
+		if (LedDriver != nullptr)
+		{
+			LedDriver->SetRGB(red, green, blue);
+		}
 	}
 };
 #endif
