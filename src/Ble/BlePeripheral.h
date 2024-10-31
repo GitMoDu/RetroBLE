@@ -99,7 +99,7 @@ public:
 	{
 		if (IsConnected())
 		{
-			BleBattery.write(chargePercentage);
+			BleBattery.notify(chargePercentage);
 		}
 	}
 
