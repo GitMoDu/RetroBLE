@@ -24,11 +24,8 @@ private:
 	uint32_t AnimationStart = 0;
 	const uint32_t UpdatePeriod;
 
-	struct DrawStateStruct
-	{
-		IIndicator::StateEnum State = IIndicator::StateEnum::Off;
-		bool Charging = false;
-	} DrawState;
+	IIndicator::StateEnum State = IIndicator::StateEnum::Off;
+	bool Charging = false;
 
 public:
 	LedAnimatorTask(TS::Scheduler& scheduler,
@@ -62,13 +59,13 @@ public:
 
 	virtual void SetDrawMode(const IIndicator::StateEnum indicatorState, const bool charging) final
 	{
-		if (DrawState.State != indicatorState)
+		if (State != indicatorState)
 		{
 			AnimationStart = millis();
 		}
 
-		DrawState.Charging = charging;
-		DrawState.State = indicatorState;
+		Charging = charging;
+		State = indicatorState;
 		UpdateLedState();
 
 		TS::Task::enableIfNot();
@@ -78,7 +75,7 @@ public:
 	{
 		UpdateLedState();
 
-		switch (DrawState.State)
+		switch (State)
 		{
 		case IIndicator::StateEnum::Off:
 			TS::Task::disable();
@@ -104,9 +101,9 @@ private:
 		bool blue = false;
 		bool green = false;
 
-		red = DrawState.Charging;
+		red = Charging;
 
-		switch (DrawState.State)
+		switch (State)
 		{
 		case IIndicator::StateEnum::Off:
 			break;
