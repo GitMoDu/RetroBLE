@@ -65,13 +65,11 @@ namespace SeeedXIAOnRF52840
 			static constexpr uint16_t R1 = 1000;
 			static constexpr uint16_t R2 = 510;
 
-			static constexpr uint16_t VMin = 3350;
-			static constexpr uint16_t VMax = 3700;
+			static constexpr uint16_t VMin = 3600;
+			static constexpr uint16_t VMax = 4000;
+			static constexpr uint16_t VMaxCharging = 4200;
 
-			static constexpr uint16_t AdcReference = 3000;
-			static constexpr uint16_t AdcMax = 4095;
-
-			static constexpr uint32_t AdcSettleMicros = 50;
+			static constexpr uint32_t AdcSettleMicros = 5;
 		};
 	}
 };

@@ -21,13 +21,11 @@ struct Bq25100Calibration
 	static constexpr uint16_t R1 = 1000;
 	static constexpr uint16_t R2 = 510;
 
-	static constexpr uint16_t VMin = 3350;
-	static constexpr uint16_t VMax = 3700;
+	static constexpr uint16_t VMin = 3600;
+	static constexpr uint16_t VMax = 4000;
+	static constexpr uint16_t VMaxCharging = 4200;
 
-	static constexpr uint16_t AdcReference = 3300;
-	static constexpr uint16_t AdcMax = 1023;
-
-	static constexpr uint32_t AdcSettleMicros = 50;
+	static constexpr uint32_t AdcSettleMicros = 15;
 };
 
 /// <summary>
@@ -73,18 +71,19 @@ public:
 		pinMode((uint8_t)Pin::Charging, INPUT);
 
 		// Disable reading of the BAT voltage.
-		digitalWrite((uint8_t)Pin::Enable, LOW);
-		pinMode((uint8_t)Pin::Enable, INPUT);
+		pinMode((uint8_t)Pin::Enable, OUTPUT);
+		digitalWrite((uint8_t)Pin::Enable, HIGH);
 
 		// Set 100mA charge current.
+		//pinMode((uint8_t)Pin::ChargeCurrent, INPUT);
 		pinMode((uint8_t)Pin::ChargeCurrent, OUTPUT);
-		pinMode((uint8_t)Pin::ChargeCurrent, HIGH);
+		digitalWrite((uint8_t)Pin::ChargeCurrent, LOW);
 
 		// Clear history.
-		Average.Clear();
+		Average.Clear(GetBatteryVoltage());
 
 		// Clear state.
-		Charging = false;
+		Charging = !digitalRead((uint8_t)Pin::Charging);
 	}
 
 	/// <summary>
@@ -123,8 +122,7 @@ public:
 	virtual void GetBatteryState(BatteryManager::BatteryStateStruct& batteryState) final
 	{
 		Charging = !digitalRead((uint8_t)Pin::Charging);
-
-		batteryState.ChargeLevel = GetBatteryChargeLevel(Average.GetAverage());
+		batteryState.ChargeLevel = GetBatteryChargeLevel(Average.GetAverage(), Charging);
 		batteryState.Charging = Charging;
 	}
 
@@ -132,25 +130,24 @@ public:
 	{
 		Charging = !digitalRead((uint8_t)Pin::Charging);
 
-		// Only enable level check if NOT charging.
-		if (!Charging)
+		// Make sure probe is disabled on wake if charging.
+		if (Charging)
 		{
-			Average.Step(GetBatteryVoltage());
-			Average.Clear();
+			DisableProbe();
 		}
+
+		const uint16_t voltage = GetBatteryVoltage();
+
+		Average.Step(voltage);
 
 		return true;
 	}
 
 private:
-	const uint8_t GetBatteryChargeLevel(const uint16_t batteryVoltage) const
+	const uint8_t GetBatteryChargeLevel(const uint16_t batteryVoltage, const bool charging) const
 	{
 		uint16_t clipped = 0;
-		if (batteryVoltage >= Calibration::VMax)
-		{
-			clipped = Calibration::VMax;
-		}
-		else if (batteryVoltage < Calibration::VMin)
+		if (batteryVoltage < Calibration::VMin)
 		{
 			clipped = Calibration::VMin;
 		}
@@ -159,13 +156,34 @@ private:
 			clipped = batteryVoltage;
 		}
 
-		return ((uint32_t)(clipped - Calibration::VMin) * BatteryManager::ChargeLevelMax)
-			/ (Calibration::VMax - Calibration::VMin);
+		// When charging, show level until expected full charge.
+		if (charging)
+		{
+			if (batteryVoltage >= Calibration::VMaxCharging)
+			{
+				return BatteryManager::ChargeLevelMax - 1;
+			}
+			else
+			{
+				return (((uint32_t)(clipped - Calibration::VMin)) * (BatteryManager::ChargeLevelMax - 1))
+					/ (Calibration::VMaxCharging - Calibration::VMin);
+			}
+		}
+		else // When discharging, show expected battery level.
+		{
+			if (batteryVoltage >= Calibration::VMax)
+			{
+				clipped = Calibration::VMax;
+			}
+
+			return (((uint32_t)(clipped - Calibration::VMin)) * BatteryManager::ChargeLevelMax)
+				/ (Calibration::VMax - Calibration::VMin);
+		}
 	}
 
+public:
 #if defined(ARDUINO_Seeed_XIAO_nRF52840_Sense) || defined(ARDUINO_Seeed_XIAO_nRF52840)
 	/// <summary>
-	/// TODO: Crashing/Not working.
 	/// 
 	/// ADC voltage read for Seeed Xiao nRF52840.
 	/// https://wiki.seeedstudio.com/XIAO_BLE#q3-what-are-the-considerations-when-using-xiao-nrf52840-sense-for-battery-charging
@@ -193,7 +211,10 @@ private:
 		analogReference(AR_DEFAULT);
 		analogReadResolution(10);
 
-		return GetVoltageFromAdc(adc);
+		static constexpr uint16_t AdcReference = 3000;
+		static constexpr uint16_t AdcMax = 4095;
+
+		return GetVInFromVOut(GetVoltageFromAdc<AdcReference, AdcMax>(adc));
 	}
 #else
 	/// <summary>
@@ -209,19 +230,26 @@ private:
 		adc = analogRead((uint8_t)Pin::VIn);
 		DisableProbe();
 
-		return GetVoltageFromAdc(adc);
+		return GetVInFromVOut(GetVoltageFromAdc<>(adc));
 	}
 #endif
 
-	static constexpr uint16_t GetVoltageFromAdc(const uint16_t adcValue)
+	template<uint16_t AdcReference = 3300, uint16_t AdcMax = 1024>
+	static const uint16_t GetVoltageFromAdc(const uint16_t adcValue)
 	{
-		return ((uint32_t)adcValue * Calibration::R2 * Calibration::AdcReference) /
-			(((uint32_t)Calibration::R1 + Calibration::R2) * Calibration::AdcMax);
+		return ((uint32_t)adcValue * AdcReference) / AdcMax;
+	}
+
+	static const uint16_t GetVInFromVOut(const uint16_t adcValue)
+	{
+		return ((uint32_t)adcValue * (Calibration::R2 + Calibration::R1)) / Calibration::R2;
 	}
 
 	void DisableProbe()
 	{
-		pinMode((uint8_t)Pin::Enable, INPUT);
+		//pinMode((uint8_t)Pin::Enable, INPUT);
+		pinMode((uint8_t)Pin::Enable, OUTPUT);
+		digitalWrite((uint8_t)Pin::Enable, HIGH);
 	}
 
 	void EnableProbe()
