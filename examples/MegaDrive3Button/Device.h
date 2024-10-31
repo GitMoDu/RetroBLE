@@ -14,12 +14,12 @@ namespace Device
 		static constexpr uint32_t SERIAL_BAUD_RATE = 115200;
 	}
 #endif
-	static constexpr char Name[] = "MegaDrive Pad";
+	static constexpr char Name[] = "Mega Drive Control Pad";
 
 	namespace Version
 	{
-		static constexpr uint16_t Code = 0;
-		static constexpr char Name[] = "0";
+		static constexpr uint16_t Code = 1;
+		static constexpr char Name[] = "1";
 	}
 
 	namespace BMS
@@ -27,8 +27,8 @@ namespace Device
 		using Pin = SeeedXIAOnRF52840::BMS::Pin;
 		using Calibration = SeeedXIAOnRF52840::BMS::Bq25100Calibration;
 
-		static constexpr uint8_t HistorySize = 10;
-		static constexpr uint32_t UpdatePeriodMillis = 50;
+		static constexpr uint8_t HistorySize = 200;
+		static constexpr uint32_t UpdatePeriodMillis = 30;
 	}
 
 	namespace Led
@@ -55,7 +55,7 @@ namespace Device
 
 	namespace BLE
 	{
-		static constexpr uint32_t UpdatePeriodMillis = 10;
+		static constexpr uint32_t UpdatePeriodMillis = 3;
 
 		static constexpr RetroBle::BleConfig::Appearance Appearance = RetroBle::BleConfig::Appearance::GamePad;
 
@@ -64,16 +64,14 @@ namespace Device
 
 	namespace USB
 	{
-		static constexpr uint32_t UpdatePeriodMillis = 5;
+		static constexpr uint32_t UpdatePeriodMillis = 2;
 
-		//TODO:
-		static constexpr uint16_t ProductId = 0;
+		static constexpr uint16_t ProductId = (uint16_t)RetroBle::Device::ProductIds::MegaDrive3Button;
 	}
 
 	namespace GamePad
 	{
 		static constexpr uint8_t WakePin = (uint8_t)MegaDriveController::Pin::StartC;
-
 	}
 
 	namespace Unused
