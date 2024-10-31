@@ -11,6 +11,7 @@
 *	- Core https://github.com/Seeed-Studio/OSHW-XIAO-Series
 *	- BLE https://github.com/adafruit/Adafruit_nRF52_Arduino/blob/master/libraries/Bluefruit52Lib/src/bluefruit.h
 *	- USB https://github.com/adafruit/Adafruit_TinyUSB_Arduino
+*	- Task Scheduler https://github.com/arkhipenko/TaskScheduler
 */
 
 //#define DEBUG
@@ -67,7 +68,7 @@ MegaDriveMapperTask<MegaDriveVirtualPadType, Device::BLE::LONG_PRESS_POWER_OFF_P
 LedAnimatorTask PadLights(SchedulerBase, &Led);
 
 // Coordinator task.
-UsbBleCoordinator Coordinator(SchedulerBase, &BMS, PadLights, &GamepadMapper, UsbDev, BleDev);
+UsbBleCoordinator Coordinator(SchedulerBase, &BMS, &PadLights, &GamepadMapper, UsbDev, BleDev);
 //
 
 void setup()
@@ -86,9 +87,11 @@ void setup()
 
 	// Battery management setup.
 	BMS.Setup();
+	BMS.Start();
 
 	// Onboard LED setup.
 	Led.Setup();
+	PadLights.Start();
 
 	// Setup controller driver.
 	MegaDriveVirtualPadWrite.Setup(OnButtonInterrupt);
