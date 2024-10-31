@@ -5,6 +5,12 @@
 
 #include <RetroBle.h>
 
+/// <summary>
+/// Maps VirtualPad to native RetroArch's RetroPad, targeting the Mega Drive 3 button layout.
+/// See more at https://docs.libretro.com/library/genesis_plus_gx/#joypad
+/// </summary>
+/// <typeparam name="MegaDriveVirtualPadType"></typeparam>
+/// <typeparam name="PowerDownHoldDuration"></typeparam>
 template<typename MegaDriveVirtualPadType,
 	const uint32_t PowerDownHoldDuration>
 class MegaDriveMapperTask : public HidGamepadTask
@@ -60,12 +66,12 @@ protected:
 
 		StartHold.Parse(millis(), Source.Start());
 
-		// Same mapping as 8BitDo M30 and S30.
+		// Mapped to native RetroArch's RetroPad.
 		hidReport.buttons =
-			(GAMEPAD_BUTTON_0 * Source.A())
-			| (GAMEPAD_BUTTON_1 * Source.B())
-			| (GAMEPAD_BUTTON_6 * Source.R3())
-			| (GAMEPAD_BUTTON_8 * Source.Start());
+			(GAMEPAD_BUTTON_Y * Source.A())
+			| (GAMEPAD_BUTTON_B * Source.B())
+			| (GAMEPAD_BUTTON_A * Source.R3())
+			| (GAMEPAD_BUTTON_START * Source.Start());
 
 		switch (Source.DPad())
 		{
@@ -78,7 +84,6 @@ protected:
 		case DPadEnum::UpRight:
 			hidReport.hat = GAMEPAD_HAT_UP_RIGHT;
 			break;
-
 		case DPadEnum::Down:
 			hidReport.hat = GAMEPAD_HAT_DOWN;
 			break;
@@ -88,7 +93,6 @@ protected:
 		case DPadEnum::DownRight:
 			hidReport.hat = GAMEPAD_HAT_DOWN_RIGHT;
 			break;
-
 		case DPadEnum::Left:
 			hidReport.hat = GAMEPAD_HAT_LEFT;
 			break;
