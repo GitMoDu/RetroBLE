@@ -61,7 +61,7 @@ MegaDriveMapperTask<MegaDriveVirtualPadType, Device::BLE::LONG_PRESS_POWER_OFF_P
 	SchedulerBase,
 	MegaDriveVirtualPadWrite,
 	UsbGamepad, BleGamepad,
-	Device::USB::UpdatePeriodMillis, Device::BLE::UpdatePeriodMillis);
+	Device::BLE::UpdatePeriodMillis);
 
 // LED animation task.
 LedAnimatorTask PadLights(SchedulerBase, &Led);
@@ -110,7 +110,9 @@ void setup()
 	// Start the device coordinator.
 	if (!Coordinator.Start())
 	{
+#if defined(DEBUG)
 		Serial.println(F("Error starting coordinator."));
+#endif
 	}
 }
 

@@ -28,9 +28,8 @@ public:
 		MegaDriveVirtualPadType& padSource,
 		UsbHidGamepad& usbGamepad,
 		BLEHidGamepad& bleGamepad,
-		const uint32_t usbUpdatePeriod = 5,
 		const uint32_t bleUpdatePeriod = 15)
-		: HidGamepadTask(scheduler, usbGamepad, bleGamepad, usbUpdatePeriod, bleUpdatePeriod)
+		: HidGamepadTask(scheduler, usbGamepad, bleGamepad, bleUpdatePeriod)
 		, Source(padSource)
 	{}
 
