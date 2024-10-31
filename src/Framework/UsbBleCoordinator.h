@@ -96,11 +96,6 @@ public:
 				TS::Task::delay(0);
 				State = StateEnum::UsbConnected;
 			}
-			//else if (HidMapper->GetElapsedMillisSinceLastActivity() > 1000) //TODO: fix and refactor constant.
-			//{
-			//	State = StateEnum::Sleep;
-			//	TS::Task::delay(0);
-			//}
 			else
 			{
 				HidMapper->SetTarget(IHidDevice::TargetEnum::None);
@@ -129,19 +124,10 @@ public:
 			else if (BleDev.IsAdvertising()
 				&& (millis() - BleStart) < RetroBle::BleConfig::ADVERTISE_NO_ACTIVITY_TIMEOUT_MILLIS)
 			{
-				if (HidMapper->IsPowerDownRequested()) // Long press to shutdown.
-				{
-					BleDev.Stop();
-					Lights.SetDrawMode(LedAnimatorTask::ConnectionLights::Off, BatteryState.Charging);
-					HidMapper->SetTarget(IHidDevice::TargetEnum::None);
-					State = StateEnum::PowerDown;
-				}
-				else
-				{
-					BMS->GetBatteryState(BatteryState);
-					Lights.SetDrawMode(LedAnimatorTask::ConnectionLights::Searching, BatteryState.Charging);
-					TS::Task::delay(RetroBle::BleConfig::BATTERY_UPDATE_PERIOD_MILLIS);
-				}
+				// Keep the lights updated.
+				BMS->GetBatteryState(BatteryState);
+				Lights.SetDrawMode(LedAnimatorTask::ConnectionLights::Searching, BatteryState.Charging);
+				TS::Task::delay(RetroBle::BleConfig::BATTERY_UPDATE_PERIOD_MILLIS);
 			}
 			else // Automatic advertising time out.
 			{
@@ -178,8 +164,7 @@ public:
 					Lights.SetDrawMode(LedAnimatorTask::ConnectionLights::Ble, BatteryState.Charging);
 					TS::Task::delay(RetroBle::BleConfig::BATTERY_UPDATE_PERIOD_MILLIS);
 
-					//TODO: Crashing/Not working.
-					//BleDev.NotifyBattery(BatteryManager::ChargeLevelPercent(BatteryState));
+					BleDev.NotifyBattery(BatteryManager::ChargeLevelPercent(BatteryState));
 				}
 			}
 			else // BLE disconnected.
@@ -207,8 +192,12 @@ public:
 			if (!HidMapper->IsPowerDownRequested())
 			{
 				State = StateEnum::Sleep;
+				TS::Task::delay(0);
 			}
-			TS::Task::delay(RetroBle::BleConfig::BATTERY_UPDATE_PERIOD_MILLIS);
+			else
+			{
+				TS::Task::delay(RetroBle::BleConfig::BATTERY_UPDATE_PERIOD_MILLIS);
+			}
 			break;
 		case StateEnum::Sleep:
 		default:
