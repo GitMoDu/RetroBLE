@@ -27,14 +27,14 @@ namespace RetroBle
 		 */
 		struct ConnectionInterval
 		{
-			static constexpr uint8_t Min = 9;
-			static constexpr uint8_t Max = 12;
+			static constexpr uint8_t Min = 6;
+			static constexpr uint8_t Max = 10;
 		};
 
-		static constexpr uint32_t BATTERY_UPDATE_PERIOD_MILLIS = 1000;
+		static constexpr uint32_t BATTERY_UPDATE_PERIOD_MILLIS = 500;
 
-		static constexpr uint32_t ADVERTISE_FAST_TIMEOUT_MILLIS = 30000;
-		static constexpr uint32_t ADVERTISE_NO_ACTIVITY_TIMEOUT_MILLIS = 60000;
+		static constexpr uint32_t ADVERTISE_FAST_TIMEOUT_MILLIS = 15000;
+		static constexpr uint32_t ADVERTISE_NO_ACTIVITY_TIMEOUT_MILLIS = 30000;
 
 		static constexpr uint32_t CONNECTED_NO_ACTIVITY_TIMEOUT_MILLIS = 5 * 60000;
 	}
