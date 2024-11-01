@@ -59,7 +59,6 @@ public:
 	HidGamepadTask(TS::Scheduler& scheduler,
 		UsbHidGamepad& usbGamepad,
 		BLEHidGamepad& bleGamepad,
-		const uint32_t usbUpdatePeriod = 5,
 		const uint32_t bleUpdatePeriod = 15)
 		: IHidDevice()
 		, TS::Task(TASK_IMMEDIATE, TASK_FOREVER, &scheduler, false)
@@ -84,7 +83,7 @@ public:
 			{
 				UsbGamepad.NotifyGamepad(HidReport);
 			}
-			TS::Task::delay(0);
+			TS::Task::delay(1);
 			break;
 		case TargetEnum::Ble:
 			BleGamepad.report(&HidReport);
