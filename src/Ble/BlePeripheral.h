@@ -47,11 +47,13 @@ public:
 		void (*onAdvertiseStop)(),
 		void (*onBleEvent)(ble_evt_t* bleEvent),
 		const RetroBle::BleConfig::Appearance appearance,
+		const uint8_t connectionIntervalMin,
+		const uint8_t connectionIntervalMax,
 		const char* name,
 		const char* version)
 	{
 		// Setup BLE and advertising service.
-		SetupBle(onConnect, onDisconnect, onBleEvent, name, version, RetroBle::BleConfig::TxPower);
+		SetupBle(onConnect, onDisconnect, onBleEvent, connectionIntervalMin, connectionIntervalMax, name, version, RetroBle::BleConfig::TxPower);
 
 		// Start all services.
 		BleDiscovery.begin();
@@ -149,6 +151,8 @@ private:
 		void (*onConnect)(const uint16_t conn_hdl),
 		void (*onDisconnect)(const uint16_t conn_hdl, const uint8_t reason),
 		void (*onBleEvent)(ble_evt_t* bleEvent),
+		const uint8_t connectionIntervalMin,
+		const uint8_t connectionIntervalMax,
 		const char* name,
 		const char* version,
 		const int8_t txPower)
@@ -171,7 +175,7 @@ private:
 		BleDiscovery.setSoftwareRev(version);
 
 		// Set connection interval (i.e. poll rate).
-		Bluefruit.Periph.setConnInterval(RetroBle::BleConfig::ConnectionInterval::Min, RetroBle::BleConfig::ConnectionInterval::Max);
+		Bluefruit.Periph.setConnInterval(connectionIntervalMin, connectionIntervalMax);
 
 		// Set connection callback listeners.
 		Bluefruit.Periph.setConnectCallback(onConnect);

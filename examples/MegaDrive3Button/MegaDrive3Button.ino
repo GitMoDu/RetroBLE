@@ -101,6 +101,8 @@ void setup()
 		connect_callback, disconnect_callback,
 		advertise_stop_callback, ble_event_callback,
 		Device::BLE::Appearance,
+		Device::BLE::ConnectionIntervalMin,
+		Device::BLE::ConnectionIntervalMax,
 		Device::Name,
 		Device::Version::Name);
 

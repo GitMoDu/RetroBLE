@@ -21,14 +21,36 @@ namespace RetroBle
 			WeightScale = BLE_APPEARANCE_GENERIC_WEIGHT_SCALE
 		};
 
-		/* Set connection interval (min, max) to your perferred value.
-		 * Note: It is already set by BLEHidAdafruit::begin() to 11.25ms - 15ms
-		 * min = 9*1.25=11.25 ms, max = 12*1.25= 15 ms
-		 */
-		struct ConnectionInterval
+		/// <summary>
+		/// BLE fastest update period with the lowest latency.
+		/// </summary>
+		namespace ConnectionIntervalFast
 		{
-			static constexpr uint8_t Min = 6;
-			static constexpr uint8_t Max = 10;
+			/// <summary>
+			/// Lowest minimum connection interval permitted, in units of 1.25 ms, i.e. 7.5 ms.
+			/// </summary>
+			static constexpr uint8_t Min = BLE_GAP_CP_MIN_CONN_INTVL_MIN;
+
+			/// <summary>
+			/// Lowest maximum connection interval permitted, in units of 1.25 ms, i.e. 7.5 ms.
+			/// </summary>
+			static constexpr uint8_t Max = BLE_GAP_CP_MAX_CONN_INTVL_MIN;
+		};
+
+		/// <summary>
+		/// Fast BLE update with some tolerance.
+		/// </summary>
+		namespace ConnectionIntervalRegular
+		{
+			/// <summary>
+			/// Lowest minimum connection interval permitted with +1 tolerance, in units of 1.25 ms, i.e. 7.5 ms.
+			/// </summary>
+			static constexpr uint8_t Min = BLE_GAP_CP_MIN_CONN_INTVL_MIN + 1;
+
+			/// <summary>
+			/// 1 more unit over the minimum.
+			/// </summary>
+			static constexpr uint8_t Max = Min + 1;
 		};
 
 		static constexpr uint32_t BATTERY_UPDATE_PERIOD_MILLIS = 500;

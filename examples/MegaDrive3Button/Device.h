@@ -55,6 +55,9 @@ namespace Device
 
 	namespace BLE
 	{
+		static constexpr uint32_t ConnectionIntervalMin = RetroBle::BleConfig::ConnectionIntervalFast::Min;
+		static constexpr uint32_t ConnectionIntervalMax = RetroBle::BleConfig::ConnectionIntervalFast::Max;
+
 		static constexpr uint32_t UpdatePeriodMillis = 3;
 
 		static constexpr RetroBle::BleConfig::Appearance Appearance = RetroBle::BleConfig::Appearance::GamePad;
