@@ -3,7 +3,6 @@
 #ifndef _HID_TO_VIRTUAL_PAD_h
 #define _HID_TO_VIRTUAL_PAD_h
 
-#include <VirtualPad.h>
 #include <WriteVirtualPad.h>
 
 #include "../Ble/BleCentral.h"
@@ -36,9 +35,6 @@ public:
 			FeaturesEnum::L3, FeaturesEnum::R3 >(),
 			VirtualPadConfiguration::NoProperties,
 			NavigationEnum::AB);
-
-private:
-	static constexpr uint32_t NO_UPDATE_TIMEOUT = 3 * 1000;
 
 public:
 	HidToVirtualPad() 
