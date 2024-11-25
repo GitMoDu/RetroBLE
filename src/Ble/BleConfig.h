@@ -3,6 +3,7 @@
 #ifndef _BLE_CONFIG_h
 #define _BLE_CONFIG_h
 
+#if defined(ARDUINO_ARCH_NRF52)
 #include <Adafruit_LittleFS.h>
 #include <InternalFileSystem.h>
 #include <bluefruit.h>
@@ -61,4 +62,5 @@ namespace RetroBle
 		static constexpr uint32_t CONNECTED_NO_ACTIVITY_TIMEOUT_MILLIS = 5 * 60000;
 	}
 }
+#endif
 #endif

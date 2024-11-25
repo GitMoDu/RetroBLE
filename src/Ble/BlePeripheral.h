@@ -3,6 +3,7 @@
 #ifndef _BLE_PERIPHERAL_h
 #define _BLE_PERIPHERAL_h
 
+#if defined(ARDUINO_ARCH_NRF52)
 #include <Adafruit_LittleFS.h>
 #include <InternalFileSystem.h>
 #include <bluefruit.h>
@@ -210,4 +211,4 @@ private:
 };
 
 #endif
-
+#endif

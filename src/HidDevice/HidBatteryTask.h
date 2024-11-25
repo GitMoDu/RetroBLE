@@ -6,13 +6,8 @@
 #if defined(_TASK_OO_CALLBACKS)
 #include <TSchedulerDeclarations.hpp>
 
-#include <Adafruit_LittleFS.h>
-#include <InternalFileSystem.h>
-#include <bluefruit.h>
-
 #include "../BatteryManager/IBatteryManager.h"
 #include "../Ble/BlePeripheral.h"
-
 
 class HidBatteryTask : private TS::Task
 {
@@ -54,6 +49,5 @@ public:
 		return true;
 	}
 };
-
 #endif
 #endif

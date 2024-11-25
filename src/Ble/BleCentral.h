@@ -3,6 +3,7 @@
 #ifndef _BLE_CENTRAL_h
 #define _BLE_CENTRAL_h
 
+#if defined(ARDUINO_ARCH_NRF52)
 #include <Adafruit_LittleFS.h>
 #include <InternalFileSystem.h>
 #include <bluefruit.h>
@@ -186,4 +187,5 @@ private:
 		Bluefruit.Scanner.start(0);  // 0 = Don't stop scanning after n seconds
 	}
 };
+#endif
 #endif
