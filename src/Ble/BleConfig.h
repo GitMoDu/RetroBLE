@@ -53,7 +53,7 @@ namespace RetroBle
 			static constexpr uint8_t Max = Min + 1;
 		};
 
-		static constexpr uint32_t BATTERY_UPDATE_PERIOD_MILLIS = 500;
+		static constexpr uint32_t BATTERY_UPDATE_PERIOD_MILLIS = 3000;
 
 		static constexpr uint32_t ADVERTISE_FAST_TIMEOUT_MILLIS = 15000;
 		static constexpr uint32_t ADVERTISE_NO_ACTIVITY_TIMEOUT_MILLIS = 30000;

@@ -12,9 +12,15 @@
 #include "../Usb/UsbPeripheral.h"
 #include "../Ble/BlePeripheral.h"
 #include "../HidDevice/IHidDevice.h"
+#include "../HidDevice/HidBatteryTask.h"
+
 
 class UsbBleCoordinator : public virtual IUsbListener, public virtual IBleListener, private TS::Task
 {
+private:
+	static constexpr uint32_t CHECK_DURATION_SHORT = 10;
+	static constexpr uint32_t CHECK_DURATION_LONG = 200;
+
 private:
 	enum class StateEnum
 	{
@@ -37,6 +43,7 @@ private:
 	BatteryManager::IBatteryManager* BMS;
 
 private:
+	HidBatteryTask HidBattery;
 	BatteryManager::BatteryStateStruct BatteryState{};
 	uint32_t BleStart = 0;
 	StateEnum State = StateEnum::Booting;
@@ -55,7 +62,9 @@ public:
 		, Lights(lights)
 		, HidMapper(hidMapper)
 		, BMS(bms)
-	{}
+		, HidBattery(scheduler, bms, bleDevice)
+	{
+	}
 
 	const bool Start()
 	{
@@ -90,6 +99,7 @@ public:
 			if (UsbDev.IsConnected())
 			{
 				HidMapper->SetTarget(IHidDevice::TargetEnum::Usb);
+				HidBattery.Disable();
 				BleDev.Stop();
 				TS::Task::delay(0);
 				State = StateEnum::UsbConnected;
@@ -107,6 +117,7 @@ public:
 			if (UsbDev.IsConnected()) // Disconnect from BLE if USB is connected.				
 			{
 				HidMapper->SetTarget(IHidDevice::TargetEnum::Usb);
+				HidBattery.Disable();
 				BleDev.Stop();
 				TS::Task::delay(0);
 				State = StateEnum::UsbConnected;
@@ -115,6 +126,7 @@ public:
 			{
 				Lights->SetDrawMode(IIndicator::StateEnum::Ble, BatteryState.Charging);
 				HidMapper->SetTarget(IHidDevice::TargetEnum::Ble);
+				HidBattery.Enable();
 				BleStart = millis();
 				TS::Task::delay(0);
 				State = StateEnum::BleConnected;
@@ -125,7 +137,7 @@ public:
 				// Keep the lights updated.
 				BMS->GetBatteryState(BatteryState);
 				Lights->SetDrawMode(IIndicator::StateEnum::Searching, BatteryState.Charging);
-				TS::Task::delay(RetroBle::BleConfig::BATTERY_UPDATE_PERIOD_MILLIS);
+				TS::Task::delay(CHECK_DURATION_SHORT);
 			}
 			else // Automatic advertising time out.
 			{
@@ -136,6 +148,7 @@ public:
 		case StateEnum::BleConnected:
 			if (UsbDev.IsConnected()) // Disconnect from BLE if USB is connected.
 			{
+				HidBattery.Disable();
 				BleDev.Stop();
 				HidMapper->SetTarget(IHidDevice::TargetEnum::Usb);
 				TS::Task::delay(0);
@@ -145,6 +158,7 @@ public:
 			{
 				if (HidMapper->IsPowerDownRequested()) // Long press to shutdown.
 				{
+					HidBattery.Disable();
 					BleDev.Stop();
 					Lights->SetDrawMode(IIndicator::StateEnum::Off, BatteryState.Charging);
 					HidMapper->SetTarget(IHidDevice::TargetEnum::None);
@@ -160,9 +174,7 @@ public:
 				{
 					BMS->GetBatteryState(BatteryState);
 					Lights->SetDrawMode(IIndicator::StateEnum::Ble, BatteryState.Charging);
-					TS::Task::delay(RetroBle::BleConfig::BATTERY_UPDATE_PERIOD_MILLIS);
-
-					BleDev.NotifyBattery(BatteryManager::ChargeLevelPercent(BatteryState));
+					TS::Task::delay(CHECK_DURATION_LONG);
 				}
 			}
 			else // BLE disconnected.
@@ -177,7 +189,7 @@ public:
 			{
 				BMS->GetBatteryState(BatteryState);
 				Lights->SetDrawMode(IIndicator::StateEnum::Usb, BatteryState.Charging);
-				TS::Task::delay(RetroBle::BleConfig::BATTERY_UPDATE_PERIOD_MILLIS);
+				TS::Task::delay(CHECK_DURATION_LONG);
 			}
 			else // USB disconnected, restart state.
 			{
@@ -194,7 +206,7 @@ public:
 			}
 			else
 			{
-				TS::Task::delay(RetroBle::BleConfig::BATTERY_UPDATE_PERIOD_MILLIS);
+				TS::Task::delay(CHECK_DURATION_SHORT);
 			}
 			break;
 		case StateEnum::Sleep:
