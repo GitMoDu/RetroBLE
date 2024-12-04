@@ -59,7 +59,7 @@ namespace RetroBle
 			/// <summary>
 			/// Sega Saturn.
 			/// </summary>
-			Saturn = (uint16_t)MegaDrive + 10,
+			Saturn = (uint16_t)Snes + 10,
 
 			/// <summary>
 			/// Sony Playstation 1,2,3,4,5, etc...
