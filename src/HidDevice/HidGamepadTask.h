@@ -59,7 +59,7 @@ public:
 	HidGamepadTask(TS::Scheduler& scheduler,
 		UsbHidGamepad& usbGamepad,
 		BLEHidGamepad& bleGamepad,
-		const uint32_t bleUpdatePeriod = 15)
+		const uint32_t bleUpdatePeriod)
 		: IHidDevice()
 		, TS::Task(TASK_IMMEDIATE, TASK_FOREVER, &scheduler, false)
 		, UsbGamepad(usbGamepad)
