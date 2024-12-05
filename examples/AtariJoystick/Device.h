@@ -14,7 +14,7 @@ namespace Device
 		static constexpr uint32_t SERIAL_BAUD_RATE = 115200;
 	}
 #endif
-	static constexpr char Name[] = "Atari 2600 Joystick";
+	static constexpr char Name[] = "Atari Joystick";
 
 	namespace Version
 	{
