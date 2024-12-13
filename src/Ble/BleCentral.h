@@ -166,13 +166,13 @@ private:
 		// 1 SRAM usage required by SoftDevice will increase dramatically with number
 		// of connections
 		Bluefruit.begin(0, 1);
-		Bluefruit.setTxPower(4);  // Check bluefruit.h for supported values
+		Bluefruit.setTxPower(RetroBle::BleConfig::TxPower);  // Check bluefruit.h for supported values
 
 		/* Set the device name */
 		Bluefruit.setName(RetroBle::Device::Manufacturer);
 
 		// Disable automatic LED handling.
-		Bluefruit.autoConnLed(true);
+		Bluefruit.autoConnLed(false);
 		Bluefruit.setConnLedInterval(UINT32_MAX);
 
 		Bluefruit.Central.setConnectCallback(onConnect);
