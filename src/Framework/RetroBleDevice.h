@@ -20,8 +20,13 @@ namespace RetroBle
 		static constexpr uint16_t VendorId = 2886;
 
 		/// <summary>
+		/// Each Base product group can have up 100 variants.
+		/// </summary>
+		static constexpr uint8_t BaseCount = 100;
+
+		/// <summary>
 		/// Base of ProductId indexes.
-		/// Each product base can have up to 10 variant ProductIds.
+		/// Each product base can have up to 100 variant ProductIds.
 		/// Roughly ordered by release date.
 		/// </summary>
 		enum class ProductBase : uint16_t
@@ -39,67 +44,67 @@ namespace RetroBle
 			/// <summary>
 			/// Nintendo Entertainment System (Famicom).
 			/// </summary>
-			Nes = (uint16_t)Atari + 10,
+			Nes = (uint16_t)Atari + GroupCount,
 
 			/// <summary>
 			/// Sega Master System.
 			/// </summary>
-			MasterSystem = (uint16_t)Nes + 10,
+			MasterSystem = (uint16_t)Nes + GroupCount,
 
 			/// <summary>
 			/// Sega MegaDrive (Genesis).
 			/// </summary>
-			MegaDrive = (uint16_t)MasterSystem + 10,
+			MegaDrive = (uint16_t)MasterSystem + GroupCount,
 
 			/// <summary>
 			/// Super Nintendo Entertainment System (Super Famicom).
 			/// </summary>
-			Snes = (uint16_t)MegaDrive + 10,
+			Snes = (uint16_t)MegaDrive + GroupCount,
 
 			/// <summary>
 			/// Sega Saturn.
 			/// </summary>
-			Saturn = (uint16_t)Snes + 10,
+			Saturn = (uint16_t)Snes + GroupCount,
 
 			/// <summary>
 			/// Sony Playstation 1,2,3,4,5, etc...
 			/// </summary>
-			Playstation = (uint16_t)Saturn + 10,
+			Playstation = (uint16_t)Saturn + GroupCount,
 
 			/// <summary>
 			/// Nintendo 64.
 			/// </summary>
-			Nintendo64 = (uint16_t)Playstation + 10,
+			Nintendo64 = (uint16_t)Playstation + GroupCount,
 
 			/// <summary>
 			/// Sega Dreamcast.
 			/// </summary>
-			Dreamcast = (uint16_t)Nintendo64 + 10,
+			Dreamcast = (uint16_t)Nintendo64 + GroupCount,
 
 			/// <summary>
 			/// Nintendo GameCube.
 			/// </summary>
-			GameCube = (uint16_t)Dreamcast + 10,
+			GameCube = (uint16_t)Dreamcast + GroupCount,
 
 			/// <summary>
 			/// Microsoft XBox Og, 360, X, Series, etc...
 			/// </summary>
-			XBox = (uint16_t)GameCube + 10,
+			XBox = (uint16_t)GameCube + GroupCount,
 
 			/// <summary>
 			/// Nintendo Wii.
 			/// </summary>
-			Wii = (uint16_t)XBox + 10,
+			Wii = (uint16_t)XBox + GroupCount,
 
 			/// <summary>
 			/// Nintendo Wii-U.
 			/// </summary>
-			WiiU = (uint16_t)Wii + 10,
+			WiiU = (uint16_t)Wii + GroupCount,
 
 			/// <summary>
 			/// Nintendo Switch.
 			/// </summary>
-			Switch = (uint16_t)WiiU + 10,
+			Switch = (uint16_t)WiiU + GroupCount,
 
 			/// <summary>
 			/// Custom controllers not tied to a console platform.
