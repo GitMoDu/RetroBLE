@@ -44,67 +44,67 @@ namespace RetroBle
 			/// <summary>
 			/// Nintendo Entertainment System (Famicom).
 			/// </summary>
-			Nes = (uint16_t)Atari + GroupCount,
+			Nes = (uint16_t)Atari + BaseCount,
 
 			/// <summary>
 			/// Sega Master System.
 			/// </summary>
-			MasterSystem = (uint16_t)Nes + GroupCount,
+			MasterSystem = (uint16_t)Nes + BaseCount,
 
 			/// <summary>
 			/// Sega MegaDrive (Genesis).
 			/// </summary>
-			MegaDrive = (uint16_t)MasterSystem + GroupCount,
+			MegaDrive = (uint16_t)MasterSystem + BaseCount,
 
 			/// <summary>
 			/// Super Nintendo Entertainment System (Super Famicom).
 			/// </summary>
-			Snes = (uint16_t)MegaDrive + GroupCount,
+			Snes = (uint16_t)MegaDrive + BaseCount,
 
 			/// <summary>
 			/// Sega Saturn.
 			/// </summary>
-			Saturn = (uint16_t)Snes + GroupCount,
+			Saturn = (uint16_t)Snes + BaseCount,
 
 			/// <summary>
 			/// Sony Playstation 1,2,3,4,5, etc...
 			/// </summary>
-			Playstation = (uint16_t)Saturn + GroupCount,
+			Playstation = (uint16_t)Saturn + BaseCount,
 
 			/// <summary>
 			/// Nintendo 64.
 			/// </summary>
-			Nintendo64 = (uint16_t)Playstation + GroupCount,
+			Nintendo64 = (uint16_t)Playstation + BaseCount,
 
 			/// <summary>
 			/// Sega Dreamcast.
 			/// </summary>
-			Dreamcast = (uint16_t)Nintendo64 + GroupCount,
+			Dreamcast = (uint16_t)Nintendo64 + BaseCount,
 
 			/// <summary>
 			/// Nintendo GameCube.
 			/// </summary>
-			GameCube = (uint16_t)Dreamcast + GroupCount,
+			GameCube = (uint16_t)Dreamcast + BaseCount,
 
 			/// <summary>
 			/// Microsoft XBox Og, 360, X, Series, etc...
 			/// </summary>
-			XBox = (uint16_t)GameCube + GroupCount,
+			XBox = (uint16_t)GameCube + BaseCount,
 
 			/// <summary>
 			/// Nintendo Wii.
 			/// </summary>
-			Wii = (uint16_t)XBox + GroupCount,
+			Wii = (uint16_t)XBox + BaseCount,
 
 			/// <summary>
 			/// Nintendo Wii-U.
 			/// </summary>
-			WiiU = (uint16_t)Wii + GroupCount,
+			WiiU = (uint16_t)Wii + BaseCount,
 
 			/// <summary>
 			/// Nintendo Switch.
 			/// </summary>
-			Switch = (uint16_t)WiiU + GroupCount,
+			Switch = (uint16_t)WiiU + BaseCount,
 
 			/// <summary>
 			/// Custom controllers not tied to a console platform.
