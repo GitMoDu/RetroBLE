@@ -16,6 +16,7 @@ The framework is built around the [Bluefruit library](https://github.com/adafrui
 - [Adafruit TinyUSB](https://github.com/adafruit/Adafruit_TinyUSB_Arduino)
 - [Seeed Studio nRF52 Core](https://github.com/Seeed-Studio/Adafruit_nRF52_Arduino)
 - [Adafruit nRF52 Core](https://github.com/adafruit/Adafruit_nRF52_Arduino)
+- [Task Scheduler](https://github.com/arkhipenko/TaskScheduler)
 
 ### Controller
 [VirtualPad](https://github.com/GitMoDu/VirtualPad)
