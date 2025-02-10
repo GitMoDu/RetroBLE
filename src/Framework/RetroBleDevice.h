@@ -118,9 +118,19 @@ namespace RetroBle
 		enum class ProductIds : uint16_t
 		{
 			/// <summary>
-			/// OG controller with 1 button.
+			/// Atari Joystick (OG).
 			/// </summary>
-			Atari = (uint16_t)ProductBase::Atari,
+			AtariJoystick = (uint16_t)ProductBase::Atari,
+
+			/// <summary>
+			/// Atari Paddle controller.
+			/// </summary>
+			AtariPaddle = (uint16_t)ProductBase::Atari + 1,
+
+			/// <summary>
+			/// Atari Driving controller.
+			/// </summary>
+			AtariDriving = (uint16_t)ProductBase::Atari + 2,
 
 			/// <summary>
 			/// Classic Famicom 2 button controller.
@@ -156,6 +166,11 @@ namespace RetroBle
 			/// Special Analog version of the Saturn controller.
 			/// </summary>
 			SaturnAnalog = (uint16_t)ProductBase::Saturn + 1,
+
+			/// <summary>
+			/// Saturn Arcade joystick.
+			/// </summary>
+			SaturnVirtuaStick = (uint16_t)ProductBase::Saturn + 1,
 
 			/// <summary>
 			/// Original Playstation 1 controller without analog sticks.
@@ -206,6 +221,37 @@ namespace RetroBle
 			/// DK Congas for GameCube.
 			/// </summary>
 			GameCubeDkCongas = (uint16_t)ProductBase::GameCube + 1,
+
+			/// <summary>
+			/// Wii Remote.
+			/// </summary>
+			WiiRemote = (uint16_t)ProductBase::Wii,
+
+			/// <summary>
+			/// Wii Nunchuck.
+			/// </summary>
+			WiiNunchuck = (uint16_t)ProductBase::Wii + 1,
+
+			/// <summary>
+			/// Wii Classic Controller.
+			/// </summary>
+			WiiClassic = (uint16_t)ProductBase::Wii + 2,
+
+			/// <summary>
+			/// Wii Classic Pro Controller.
+			/// </summary>
+			WiiClassicPro = (uint16_t)ProductBase::Wii + 3,
+
+			/// <summary>
+			/// WiiU Gamepad.
+			/// </summary>
+			WiiU = (uint16_t)ProductBase::WiiU,
+
+			/// <summary>
+			/// WiiU Pro Controller.
+			/// </summary>
+			WiiUPro = (uint16_t)ProductBase::WiiU + 1,
+
 		};
 	}
 }
