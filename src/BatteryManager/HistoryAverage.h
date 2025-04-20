@@ -1,12 +1,10 @@
-// HistoryAverage.h
-
 #ifndef _HISTORY_AVERAGE_h
 #define _HISTORY_AVERAGE_h
 
 #include <stdint.h>
 
 /// <summary>
-/// Uint16 rolling average stepper and calculator, with templated history size.
+/// uint16 rolling average stepper and calculator, with templated history size.
 /// </summary>
 /// <typeparam name="HistorySize">Total sample count in rolling history [0 ; UINT8_MAX]</typeparam>
 template<uint8_t HistorySize>

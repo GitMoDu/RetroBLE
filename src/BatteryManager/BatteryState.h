@@ -1,5 +1,3 @@
-// BatteryState.h
-
 #ifndef _BATTERY_STATE_h
 #define _BATTERY_STATE_h
 
@@ -24,7 +22,7 @@ namespace BatteryManager
 	/// </summary>
 	/// <param name="chargeLevel">Charge level [0 ; ChargeLevelMax]</param>
 	/// <returns>Charge level in percentage [0% ; 100%].</returns>
-	const uint8_t ChargeLevelPercent(const uint8_t chargeLevel)
+	static const uint8_t ChargeLevelPercent(const uint8_t chargeLevel)
 	{
 		if (chargeLevel < ChargeLevelMax)
 		{
@@ -41,7 +39,7 @@ namespace BatteryManager
 	/// </summary>
 	/// <param name="batteryState"></param>
 	/// <returns>Charge level in percentage [0% ; 100%].</returns>
-	const uint8_t ChargeLevelPercent(BatteryStateStruct& batteryState)
+	static const uint8_t ChargeLevelPercent(const BatteryStateStruct& batteryState)
 	{
 		return ChargeLevelPercent(batteryState.ChargeLevel);
 	}

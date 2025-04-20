@@ -1,5 +1,3 @@
-// Bq25100Driver.h
-
 #ifndef _BQ_25100_DRIVER_h
 #define _BQ_25100_DRIVER_h
 
