@@ -1,5 +1,3 @@
-// IBatteryManager.h
-
 #ifndef _I_BATTERY_MANAGER_h
 #define _I_BATTERY_MANAGER_h
 
@@ -11,7 +9,7 @@ namespace BatteryManager
 	/// <summary>
 	/// Class interface for BMS.
 	/// </summary>
-	class IBatteryManager : public virtual BatteryManager::ISleep
+	class IBatteryManager : public ISleep
 	{
 	public:
 		virtual void GetBatteryState(BatteryStateStruct& batteryState) {}

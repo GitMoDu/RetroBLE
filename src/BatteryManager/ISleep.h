@@ -1,5 +1,3 @@
-// ISleep.h
-
 #ifndef _I_SLEEP_h
 #define _I_SLEEP_h
 
