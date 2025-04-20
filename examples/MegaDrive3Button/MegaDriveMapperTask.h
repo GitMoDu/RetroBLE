@@ -4,6 +4,7 @@
 #define _MEGA_DRIVE_MAPPER_TASK_h
 
 #include <RetroBle.h>
+#include <VirtualPad.h>
 
 /// <summary>
 /// Maps VirtualPad to native RetroArch's RetroPad, targeting the Mega Drive 3 button layout.
@@ -17,11 +18,11 @@ class MegaDriveMapperTask : public HidGamepadTask
 {
 private:
 	MegaDriveVirtualPadType& Source;
-	ButtonParser::ActionTimed StartHold{};
+	VirtualPad::ButtonParser::ActionTimed StartHold{};
 
 private:
-	virtual_pad_state_t SleepControllerState{};
-	virtual_pad_state_t WakeControllerState{};
+	VirtualPad::button_pad_state_t SleepControllerState{};
+	VirtualPad::button_pad_state_t WakeControllerState{};
 
 public:
 	MegaDriveMapperTask(TS::Scheduler& scheduler,
@@ -31,7 +32,8 @@ public:
 		const uint32_t bleUpdatePeriod = 15)
 		: HidGamepadTask(scheduler, usbGamepad, bleGamepad, bleUpdatePeriod)
 		, Source(padSource)
-	{}
+	{
+	}
 
 public:
 	virtual const bool IsPowerDownRequested() final
@@ -74,31 +76,31 @@ protected:
 
 		switch (Source.DPad())
 		{
-		case DPadEnum::Up:
+		case VirtualPad::DPadEnum::Up:
 			hidReport.hat = GAMEPAD_HAT_UP;
 			break;
-		case DPadEnum::UpLeft:
+		case VirtualPad::DPadEnum::UpLeft:
 			hidReport.hat = GAMEPAD_HAT_UP_LEFT;
 			break;
-		case DPadEnum::UpRight:
+		case VirtualPad::DPadEnum::UpRight:
 			hidReport.hat = GAMEPAD_HAT_UP_RIGHT;
 			break;
-		case DPadEnum::Down:
+		case VirtualPad::DPadEnum::Down:
 			hidReport.hat = GAMEPAD_HAT_DOWN;
 			break;
-		case DPadEnum::DownLeft:
+		case VirtualPad::DPadEnum::DownLeft:
 			hidReport.hat = GAMEPAD_HAT_DOWN_LEFT;
 			break;
-		case DPadEnum::DownRight:
+		case VirtualPad::DPadEnum::DownRight:
 			hidReport.hat = GAMEPAD_HAT_DOWN_RIGHT;
 			break;
-		case DPadEnum::Left:
+		case VirtualPad::DPadEnum::Left:
 			hidReport.hat = GAMEPAD_HAT_LEFT;
 			break;
-		case DPadEnum::Right:
+		case VirtualPad::DPadEnum::Right:
 			hidReport.hat = GAMEPAD_HAT_RIGHT;
 			break;
-		case DPadEnum::None:
+		case VirtualPad::DPadEnum::None:
 		default:
 			hidReport.hat = GAMEPAD_HAT_CENTERED;
 			break;

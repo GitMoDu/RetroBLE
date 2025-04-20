@@ -3,16 +3,17 @@
 #ifndef _MEGA_DRIVE_SLEEPY_PAD_h
 #define _MEGA_DRIVE_SLEEPY_PAD_h
 
-#include <WriteVirtualPad.h>
-#include <VirtualPadSources.h>
+#include <VirtualPads.h>
 #include <RetroBle.h>
 
 template<typename ControllerPin,
 	const uint8_t WakePin>
-class MegaDriveSleepyPad : public virtual BatteryManager::ISleep, public MegaDriveVirtualPadWriter<ControllerPin>
+class MegaDriveSleepyPad 
+	: public virtual BatteryManager::ISleep
+	, public MegaDriveController::MegaDriveControllerVirtualPad<ControllerPin>
 {
 protected:
-	using Base = MegaDriveVirtualPadWriter<ControllerPin>;
+	using Base = MegaDriveController::MegaDriveControllerVirtualPad<ControllerPin>;
 	using Base::PIN_INPUT_MODE;
 
 private:

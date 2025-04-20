@@ -1,11 +1,9 @@
-// Device.h
-
 #ifndef _DEVICE_h
 #define _DEVICE_h
 
 #if defined(ARDUINO_ARCH_NRF52)
-//#if defined(ARDUINO_Seeed_XIAO_nRF52840_Sense) || defined(ARDUINO_Seeed_XIAO_nRF52840)
 #include <RetroBle.h>
+#include <VirtualPad.h>
 
 namespace Device
 {
@@ -32,7 +30,7 @@ namespace Device
 			Rx = PIN_SERIAL1_RX,
 			Tx = PIN_SERIAL1_TX
 		};
-		
+
 	}
 
 	namespace BLE
@@ -42,7 +40,26 @@ namespace Device
 	namespace Unused
 	{
 		static constexpr uint8_t Pins[] = { };
-	};
+	}
+
+	namespace VirtualPadUartInterface
+	{
+		static constexpr uint32_t ConfigurationCode =
+			VirtualPad::Configuration::GetConfigurationCode(
+				VirtualPad::Configuration::GetFeatureFlags< VirtualPad::Configuration::FeaturesEnum::DPad,
+				VirtualPad::Configuration::FeaturesEnum::Joy1,
+				VirtualPad::Configuration::FeaturesEnum::Joy2,
+				VirtualPad::Configuration::FeaturesEnum::Start, VirtualPad::Configuration::FeaturesEnum::Select,
+				VirtualPad::Configuration::FeaturesEnum::Home, VirtualPad::Configuration::FeaturesEnum::Share,
+				VirtualPad::Configuration::FeaturesEnum::A, VirtualPad::Configuration::FeaturesEnum::B,
+				VirtualPad::Configuration::FeaturesEnum::X, VirtualPad::Configuration::FeaturesEnum::Y,
+				VirtualPad::Configuration::FeaturesEnum::L1, VirtualPad::Configuration::FeaturesEnum::R1,
+				VirtualPad::Configuration::FeaturesEnum::L2, VirtualPad::Configuration::FeaturesEnum::R2,
+				VirtualPad::Configuration::FeaturesEnum::L3, VirtualPad::Configuration::FeaturesEnum::R3,
+				VirtualPad::Configuration::FeaturesEnum::Motion>(),
+				VirtualPad::Configuration::NoProperties,
+				VirtualPad::Configuration::NavigationEnum::AB);
+	}
 };
 
 #else

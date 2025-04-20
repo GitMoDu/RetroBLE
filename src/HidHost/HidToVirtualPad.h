@@ -1,9 +1,7 @@
-// HidToVirtualPad.h
-
 #ifndef _HID_TO_VIRTUAL_PAD_h
 #define _HID_TO_VIRTUAL_PAD_h
 
-#include <WriteVirtualPad.h>
+#include <VirtualPad.h>
 
 #include "../Ble/BleCentral.h"
 #include "XBoxControllerHid.h"
@@ -16,39 +14,30 @@ enum class HidMapTypeEnum : uint16_t
 	GenericGamepad = 0
 };
 
+
 /// <summary>
 /// HID source controller, mapped to Virtual Pad.
 /// </summary>
-class HidToVirtualPad : public virtual IHidListener, public WriteVirtualPad
+template<uint32_t hidConfigurationCode>
+class HidToVirtualPad : public virtual IHidListener, public VirtualPad::MotionVirtualPad<hidConfigurationCode>
 {
-public:
-	static constexpr uint32_t ConfigurationCode =
-		VirtualPadConfiguration::GetConfigurationCode(
-			VirtualPadConfiguration::GetFeatureFlags<FeaturesEnum::DPad,
-			FeaturesEnum::Joy1,
-			FeaturesEnum::Joy2,
-			FeaturesEnum::Start, FeaturesEnum::Select,
-			FeaturesEnum::Home, FeaturesEnum::Share,
-			FeaturesEnum::A, FeaturesEnum::B, FeaturesEnum::X, FeaturesEnum::Y,
-			FeaturesEnum::L1, FeaturesEnum::R1,
-			FeaturesEnum::L2, FeaturesEnum::R2,
-			FeaturesEnum::L3, FeaturesEnum::R3 >(),
-			VirtualPadConfiguration::NoProperties,
-			NavigationEnum::AB);
+private:
+	using Base = VirtualPad::MotionVirtualPad<hidConfigurationCode>;
 
 public:
-	HidToVirtualPad() 
+	HidToVirtualPad()
 		: IHidListener()
-		, WriteVirtualPad(ConfigurationCode)
-	{}
+		, Base()
+	{
+	}
 
 public:
 	virtual void OnStateChange(const bool connected)
 	{
-		if (Connected() != connected)
+		if (Base::Connected() != connected)
 		{
-			Clear();
-			SetConnected(connected);
+			Base::Clear();
+			SetConnected(*this, connected);
 		}
 	}
 
@@ -62,7 +51,7 @@ public:
 	/// <param name="data"></param>
 	/// <param name="size"></param>
 	/// <param name="uuid"></param>
-	virtual void OnReportNotify(uint8_t* data, const uint16_t size, const uint16_t uuid) final
+	virtual void OnControllerNotify(uint8_t* data, const uint16_t size, const uint16_t uuid) final
 	{
 		if (data != nullptr)
 		{
@@ -89,7 +78,7 @@ public:
 		}
 		else
 		{
-			SetConnected(false);
+			SetConnected(*this, false);
 		}
 	}
 
@@ -97,9 +86,9 @@ private:
 	// TODO
 	void HidMapGenericGamepad(uint8_t* data, const uint16_t len)
 	{
-		if (Connected())
+		if (Base::Connected())
 		{
-			SetConnected(false);
+			SetConnected(*this, false);
 		}
 	}
 
@@ -112,42 +101,42 @@ private:
 			const int16_t y1 = -((data[2] | (uint16_t)data[3] << 8) - (uint16_t)INT16_MAX);
 			const int16_t x2 = (data[4] | (uint16_t)data[5] << 8) - (uint16_t)INT16_MAX - 1;
 			const int16_t y2 = -((data[6] | (uint16_t)data[7] << 8) - (uint16_t)INT16_MAX);
-			SetJoy1(x1, y1);
-			SetJoy2(x2, y2);
+			SetJoy1(*this, x1, y1);
+			SetJoy2(*this, x2, y2);
 
 			// Scale to uint16_t full range.
 			const uint16_t l2 = ((uint32_t)(data[8] | (uint16_t)data[9] << 8) * UINT16_MAX) / XBoxControllerHid::TriggerMax;
 			const uint16_t r2 = ((uint32_t)(data[10] | (uint16_t)data[11] << 8) * UINT16_MAX) / XBoxControllerHid::TriggerMax;
-			SetL2(l2);
-			SetR2(r2);
+			SetL2(*this, l2);
+			SetR2(*this, r2);
 
 			// Virtual Pad DPadEnum is derived from HID DPad and is compatible with XBox mapping.
-			State.DPad = (DPadEnum)data[12];
+			Base::dPad = VirtualPad::DPadEnum(data[12]);
 
 			// First byte of buttons.
 			const uint8_t buttons1 = data[13];
-			SetA(GetButton<(uint8_t)XBoxControllerHid::Buttons1::A>(buttons1));
-			SetB(GetButton<(uint8_t)XBoxControllerHid::Buttons1::B>(buttons1));
-			SetX(GetButton<(uint8_t)XBoxControllerHid::Buttons1::X>(buttons1));
-			SetY(GetButton<(uint8_t)XBoxControllerHid::Buttons1::Y>(buttons1));
-			SetL1(GetButton<(uint8_t)XBoxControllerHid::Buttons1::L1>(buttons1));
-			SetR1(GetButton<(uint8_t)XBoxControllerHid::Buttons1::R1>(buttons1));
+			SetA(*this, GetButton<(uint8_t)XBoxControllerHid::Buttons1::A>(buttons1));
+			SetB(*this, GetButton<(uint8_t)XBoxControllerHid::Buttons1::B>(buttons1));
+			SetX(*this, GetButton<(uint8_t)XBoxControllerHid::Buttons1::X>(buttons1));
+			SetY(*this, GetButton<(uint8_t)XBoxControllerHid::Buttons1::Y>(buttons1));
+			SetL1(*this, GetButton<(uint8_t)XBoxControllerHid::Buttons1::L1>(buttons1));
+			SetR1(*this, GetButton<(uint8_t)XBoxControllerHid::Buttons1::R1>(buttons1));
 
 			// Second byte of buttons.
 			const uint8_t buttons2 = data[14];
-			SetSelect(GetButton<(uint8_t)XBoxControllerHid::Buttons2::Select>(buttons2));
-			SetStart(GetButton<(uint8_t)XBoxControllerHid::Buttons2::Start>(buttons2));
-			SetL3(GetButton<(uint8_t)XBoxControllerHid::Buttons2::L3>(buttons2));
-			SetR3(GetButton<(uint8_t)XBoxControllerHid::Buttons2::R3>(buttons2));
-			SetHome(GetButton<(uint8_t)XBoxControllerHid::Buttons2::Home>(buttons2));
+			SetSelect(*this, GetButton<(uint8_t)XBoxControllerHid::Buttons2::Select>(buttons2));
+			SetStart(*this, GetButton<(uint8_t)XBoxControllerHid::Buttons2::Start>(buttons2));
+			SetL3(*this, GetButton<(uint8_t)XBoxControllerHid::Buttons2::L3>(buttons2));
+			SetR3(*this, GetButton<(uint8_t)XBoxControllerHid::Buttons2::R3>(buttons2));
+			SetHome(*this, GetButton<(uint8_t)XBoxControllerHid::Buttons2::Home>(buttons2));
 
 			// Third byte of buttons.
 			const uint8_t buttons3 = data[15];
-			SetShare(GetButton<(uint8_t)XBoxControllerHid::Buttons3::Share>(buttons3));
+			SetShare(*this, GetButton<(uint8_t)XBoxControllerHid::Buttons3::Share>(buttons3));
 
-			if (!Connected())
+			if (!Base::Connected())
 			{
-				SetConnected(true);
+				SetConnected(*this, true);
 			}
 		}
 	}

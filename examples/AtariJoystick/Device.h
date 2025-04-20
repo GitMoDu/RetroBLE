@@ -66,7 +66,7 @@ namespace Device
 	{
 		static constexpr uint32_t UpdatePeriodMillis = 2;
 
-		static constexpr uint16_t ProductId = (uint16_t)RetroBle::Device::ProductIds::Atari;
+		static constexpr uint16_t ProductId = (uint16_t)RetroBle::Device::ProductIds::AtariJoystick;
 	}
 
 	namespace Unused

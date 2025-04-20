@@ -1,9 +1,6 @@
 /*
 * Retro BLE Pad host (BLE Central).
 *
-* Retro BLE features
-*	- Battery level state.
-*	- State LEDs.
 *
 * Dependencies:
 *   - Core:
@@ -11,7 +8,7 @@
 *	- Uart interface:  https://github.com/GitMoDu/UartInterface
 */
 
-#define DEBUG
+//#define DEBUG
 
 #define _TASK_OO_CALLBACKS
 #include <TScheduler.hpp>
@@ -22,19 +19,18 @@
 #include <VirtualPadUartInterface.h>
 
 // Process scheduler.
-TS::Scheduler SchedulerBase;
+TS::Scheduler SchedulerBase{};
 // 
 
 // Pad state source.
-HidToVirtualPad Pad{};
+HidToVirtualPad<Device::VirtualPadUartInterface::ConfigurationCode> Pad{};
 
 // Host (central).
 BleCentral Central(&Pad);
 
 // Uart server.
 using UartType = Uart;
-UartType& UartInstance = Device::UartInterface::UartInstance;
-VirtualPadUartServer<UartType> UartServer(SchedulerBase, UartInstance, Pad);
+VirtualPadUartServer<UartType> UartServer(SchedulerBase, Serial1, Pad);
 
 void setup()
 {
@@ -42,9 +38,15 @@ void setup()
 	Serial.begin(Device::Debug::SERIAL_BAUD_RATE);
 
 	// Blocking wait for connection when debug mode is enabled via IDE
-	while (!Serial) delay(10);
+	while (!Serial)
+		delay(10);
 
 	Serial.println(F("Host Hid Gamepad start"));
+
+	Pad.LogFeatures();
+	Pad.LogPropertiesNavigation();
+
+	Serial.flush();
 #endif
 
 	// Disable unused pins.
@@ -58,11 +60,15 @@ void setup()
 
 	// Start pushing out state updates on UART.
 	UartServer.Start();
-	UartInstance.setPins((uint8_t)Device::UartInterface::Pin::Rx, (uint8_t)Device::UartInterface::Pin::Tx);
 }
 
 void loop()
 {
+	if (Serial1.available())
+	{
+		UartServer.OnSerialEvent();
+	}
+
 	SchedulerBase.execute();
 }
 

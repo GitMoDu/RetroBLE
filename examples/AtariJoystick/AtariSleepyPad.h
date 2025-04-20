@@ -1,18 +1,15 @@
-// AtariSleepyPad.h
-
 #ifndef _ATARI_SLEEPY_PAD_h
 #define _ATARI_SLEEPY_PAD_h
 
-#include <WriteVirtualPad.h>
-#include <VirtualPadSources.h>
+#include <VirtualPads.h>
 #include <RetroBle.h>
 
 template<typename ControllerPin,
 	uint8_t WakePin>
-class AtariSleepyPad : public virtual BatteryManager::ISleep, public AtariJoystickVirtualPadWriter<ControllerPin>
+class AtariSleepyPad : public virtual BatteryManager::ISleep, public AtariJoystick::AtariJoystickVirtualPad<ControllerPin>
 {
 protected:
-	using Base = AtariJoystickVirtualPadWriter<ControllerPin>;
+	using Base = AtariJoystick::AtariJoystickVirtualPad<ControllerPin>;
 	using Base::PIN_INPUT_MODE;
 
 private:
