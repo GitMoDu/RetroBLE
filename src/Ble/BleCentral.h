@@ -1,5 +1,3 @@
-// BleCentral.h
-
 #ifndef _BLE_CENTRAL_h
 #define _BLE_CENTRAL_h
 
@@ -15,7 +13,7 @@
 class IHidListener
 {
 public:
-	virtual void OnReportNotify(uint8_t* data, const uint16_t size, const uint16_t uuid) {}
+	virtual void OnControllerNotify(uint8_t* data, const uint16_t size, const uint16_t uuid) {}
 	virtual void OnStateChange(const bool connected) {}
 };
 
@@ -39,7 +37,8 @@ public:
 		, CharaReportMap(UUID16_CHR_REPORT_MAP)
 		, XBoxService(UUID16_SVC_HUMAN_INTERFACE_DEVICE)
 		, HidListener(hidListener)
-	{}
+	{
+	}
 
 	void Setup(void (*onConnect)(const uint16_t conn_hdl),
 		void (*onDisconnect)(const uint16_t conn_hdl, const uint8_t reason),
@@ -47,10 +46,9 @@ public:
 		void (*onConnectionSecured)(uint16_t conn_handle),
 		void (*onReportNotify)(BLEClientCharacteristic* chr, uint8_t* data, uint16_t len))
 	{
-		CharaReport.setNotifyCallback(onReportNotify);
-
 		XBoxService.begin();
 
+		CharaReport.setNotifyCallback(onReportNotify);
 		CharaReport.begin();
 		CharaReportMap.begin();
 
@@ -152,7 +150,23 @@ public:
 			&& data != nullptr
 			&& HidListener != nullptr)
 		{
-			HidListener->OnReportNotify(data, len, chr->uuid._uuid.uuid);
+			uint16_t uuid = 0;
+			chr->uuid.get(&uuid);
+			//XBoxService.uuid.get(&uuid);
+			//GenericGamepadService.uuid.get(&uuid);
+			//BatteryService.uuid.get(&uuid);
+
+			if (uuid == UUID16_CHR_REPORT)
+			{
+				HidListener->OnControllerNotify(data, len, chr->uuid._uuid.uuid);
+			}
+#if defined(DEBUG)
+			else
+			{
+				Serial.print(F("No UUID Match Report: "));
+				Serial.println(uuid1);
+			}
+#endif
 		}
 	}
 
@@ -180,7 +194,7 @@ private:
 		Bluefruit.Security.setSecuredCallback(onConnectionSecured);
 		Bluefruit.Scanner.setRxCallback(onScanCallback);
 		Bluefruit.Scanner.restartOnDisconnect(true);
-		Bluefruit.Scanner.filterUuid(XBoxService.uuid);
+		Bluefruit.Scanner.filterService(XBoxService);
 		Bluefruit.Scanner.filterRssi(-80);
 		Bluefruit.Scanner.setInterval(160, 80);  // in units of 0.625 ms
 		Bluefruit.Scanner.useActiveScan(true);   // Request scan response data
