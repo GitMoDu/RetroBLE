@@ -19,10 +19,10 @@ enum class HidMapTypeEnum : uint16_t
 /// HID source controller, mapped to Virtual Pad.
 /// </summary>
 template<uint32_t hidConfigurationCode>
-class HidToVirtualPad : public virtual IHidListener, public VirtualPad::MotionVirtualPad<hidConfigurationCode>
+class HidToVirtualPad : public virtual IHidListener, public VirtualPad::AnalogVirtualPad<hidConfigurationCode>
 {
 private:
-	using Base = VirtualPad::MotionVirtualPad<hidConfigurationCode>;
+	using Base = VirtualPad::AnalogVirtualPad<hidConfigurationCode>;
 
 public:
 	HidToVirtualPad()
@@ -37,7 +37,7 @@ public:
 		if (Base::Connected() != connected)
 		{
 			Base::Clear();
-			SetConnected(*this, connected);
+			Base::SetConnected(connected);
 		}
 	}
 
@@ -78,7 +78,7 @@ public:
 		}
 		else
 		{
-			SetConnected(*this, false);
+			Base::SetConnected(false);
 		}
 	}
 
@@ -88,7 +88,7 @@ private:
 	{
 		if (Base::Connected())
 		{
-			SetConnected(*this, false);
+			Base::SetConnected(false);
 		}
 	}
 
@@ -101,42 +101,42 @@ private:
 			const int16_t y1 = -((data[2] | (uint16_t)data[3] << 8) - (uint16_t)INT16_MAX);
 			const int16_t x2 = (data[4] | (uint16_t)data[5] << 8) - (uint16_t)INT16_MAX - 1;
 			const int16_t y2 = -((data[6] | (uint16_t)data[7] << 8) - (uint16_t)INT16_MAX);
-			SetJoy1(*this, x1, y1);
-			SetJoy2(*this, x2, y2);
+			Base::SetJoy1(x1, y1);
+			Base::SetJoy2(x2, y2);
 
 			// Scale to uint16_t full range.
 			const uint16_t l2 = ((uint32_t)(data[8] | (uint16_t)data[9] << 8) * UINT16_MAX) / XBoxControllerHid::TriggerMax;
 			const uint16_t r2 = ((uint32_t)(data[10] | (uint16_t)data[11] << 8) * UINT16_MAX) / XBoxControllerHid::TriggerMax;
-			SetL2(*this, l2);
-			SetR2(*this, r2);
+			Base::SetL2(l2);
+			Base::SetR2(r2);
 
 			// Virtual Pad DPadEnum is derived from HID DPad and is compatible with XBox mapping.
 			Base::dPad = VirtualPad::DPadEnum(data[12]);
 
 			// First byte of buttons.
 			const uint8_t buttons1 = data[13];
-			SetA(*this, GetButton<(uint8_t)XBoxControllerHid::Buttons1::A>(buttons1));
-			SetB(*this, GetButton<(uint8_t)XBoxControllerHid::Buttons1::B>(buttons1));
-			SetX(*this, GetButton<(uint8_t)XBoxControllerHid::Buttons1::X>(buttons1));
-			SetY(*this, GetButton<(uint8_t)XBoxControllerHid::Buttons1::Y>(buttons1));
-			SetL1(*this, GetButton<(uint8_t)XBoxControllerHid::Buttons1::L1>(buttons1));
-			SetR1(*this, GetButton<(uint8_t)XBoxControllerHid::Buttons1::R1>(buttons1));
+			Base::SetA(GetButton<(uint8_t)XBoxControllerHid::Buttons1::A>(buttons1));
+			Base::SetB(GetButton<(uint8_t)XBoxControllerHid::Buttons1::B>(buttons1));
+			Base::SetX(GetButton<(uint8_t)XBoxControllerHid::Buttons1::X>(buttons1));
+			Base::SetY(GetButton<(uint8_t)XBoxControllerHid::Buttons1::Y>(buttons1));
+			Base::SetL1(GetButton<(uint8_t)XBoxControllerHid::Buttons1::L1>(buttons1));
+			Base::SetR1(GetButton<(uint8_t)XBoxControllerHid::Buttons1::R1>(buttons1));
 
 			// Second byte of buttons.
 			const uint8_t buttons2 = data[14];
-			SetSelect(*this, GetButton<(uint8_t)XBoxControllerHid::Buttons2::Select>(buttons2));
-			SetStart(*this, GetButton<(uint8_t)XBoxControllerHid::Buttons2::Start>(buttons2));
-			SetL3(*this, GetButton<(uint8_t)XBoxControllerHid::Buttons2::L3>(buttons2));
-			SetR3(*this, GetButton<(uint8_t)XBoxControllerHid::Buttons2::R3>(buttons2));
-			SetHome(*this, GetButton<(uint8_t)XBoxControllerHid::Buttons2::Home>(buttons2));
+			Base::SetSelect(GetButton<(uint8_t)XBoxControllerHid::Buttons2::Select>(buttons2));
+			Base::SetStart(GetButton<(uint8_t)XBoxControllerHid::Buttons2::Start>(buttons2));
+			Base::SetL3(GetButton<(uint8_t)XBoxControllerHid::Buttons2::L3>(buttons2));
+			Base::SetR3(GetButton<(uint8_t)XBoxControllerHid::Buttons2::R3>(buttons2));
+			Base::SetHome(GetButton<(uint8_t)XBoxControllerHid::Buttons2::Home>(buttons2));
 
 			// Third byte of buttons.
 			const uint8_t buttons3 = data[15];
-			SetShare(*this, GetButton<(uint8_t)XBoxControllerHid::Buttons3::Share>(buttons3));
+			Base::SetShare(GetButton<(uint8_t)XBoxControllerHid::Buttons3::Share>(buttons3));
 
 			if (!Base::Connected())
 			{
-				SetConnected(*this, true);
+				Base::SetConnected(true);
 			}
 		}
 	}
@@ -152,52 +152,52 @@ private:
 public:
 	void LogState()
 	{
-		if (Connected())
+		if (Base::Connected())
 		{
 			Serial.println();
 			Serial.print(F("Navigation\t"));
-			if (Home())
+			if (Base::Home())
 			{
 				Serial.print(F("Home "));
 			}
-			if (GetAccept())
+			if (Base::GetAccept())
 			{
 				Serial.print(F("Accept "));
 			}
-			if (GetReject())
+			if (Base::GetReject())
 			{
 				Serial.print(F("Reject "));
 			}
 			Serial.println();
 
 			Serial.print(F("DPad\t"));
-			switch (DPad())
+			switch (Base::DPad())
 			{
-			case DPadEnum::Up:
+			case VirtualPad::DPadEnum::Up:
 				Serial.println(F("Up"));
 				break;
-			case DPadEnum::UpRight:
+			case VirtualPad::DPadEnum::UpRight:
 				Serial.println(F("UpRight"));
 				break;
-			case DPadEnum::Right:
+			case VirtualPad::DPadEnum::Right:
 				Serial.println(F("Right"));
 				break;
-			case DPadEnum::DownRight:
+			case VirtualPad::DPadEnum::DownRight:
 				Serial.println(F("DownRight"));
 				break;
-			case DPadEnum::Down:
+			case VirtualPad::DPadEnum::Down:
 				Serial.println(F("Down"));
 				break;
-			case DPadEnum::DownLeft:
+			case VirtualPad::DPadEnum::DownLeft:
 				Serial.println(F("DownLeft"));
 				break;
-			case DPadEnum::Left:
+			case VirtualPad::DPadEnum::Left:
 				Serial.println(F("Left"));
 				break;
-			case DPadEnum::UpLeft:
+			case VirtualPad::DPadEnum::UpLeft:
 				Serial.println(F("UpLeft"));
 				break;
-			case DPadEnum::None:
+			case VirtualPad::DPadEnum::None:
 			default:
 				Serial.println(F("Center"));
 				break;
@@ -205,9 +205,9 @@ public:
 
 			Serial.print(F("Main Buttons\t"));
 
-			if (FeatureA())
+			if (Base::FeatureA())
 			{
-				if (A())
+				if (Base::A())
 				{
 					Serial.print(F("A  "));
 				}
@@ -217,9 +217,9 @@ public:
 				}
 			}
 
-			if (FeatureB())
+			if (Base::FeatureB())
 			{
-				if (B())
+				if (Base::B())
 				{
 					Serial.print(F("B  "));
 				}
@@ -229,9 +229,9 @@ public:
 				}
 			}
 
-			if (FeatureX())
+			if (Base::FeatureX())
 			{
-				if (X())
+				if (Base::X())
 				{
 					Serial.print(F("X  "));
 				}
@@ -241,9 +241,9 @@ public:
 				}
 			}
 
-			if (FeatureY())
+			if (Base::FeatureY())
 			{
-				if (Y())
+				if (Base::Y())
 				{
 					Serial.print(F("Y  "));
 				}
@@ -253,9 +253,9 @@ public:
 				}
 			}
 
-			if (FeatureL1())
+			if (Base::FeatureL1())
 			{
-				if (L1())
+				if (Base::L1())
 				{
 					Serial.print(F("L1 "));
 				}
@@ -265,9 +265,9 @@ public:
 				}
 			}
 
-			if (FeatureR1())
+			if (Base::FeatureR1())
 			{
-				if (R1())
+				if (Base::R1())
 				{
 					Serial.print(F("R1 "));
 				}
@@ -277,9 +277,9 @@ public:
 				}
 			}
 
-			if (FeatureL3())
+			if (Base::FeatureL3())
 			{
-				if (L3())
+				if (Base::L3())
 				{
 					Serial.print(F("L3 "));
 				}
@@ -289,9 +289,9 @@ public:
 				}
 			}
 
-			if (FeatureR3())
+			if (Base::FeatureR3())
 			{
-				if (R3())
+				if (Base::R3())
 				{
 					Serial.print(F("R3 "));
 				}
@@ -303,49 +303,49 @@ public:
 			Serial.println();
 
 			Serial.print(F("Menu Buttons\t"));
-			if (Start())
+			if (Base::Start())
 			{
 				Serial.print(F("Start "));
 			}
-			if (Select())
+			if (Base::Select())
 			{
 				Serial.print(F("Select "));
 			}
-			if (Home())
+			if (Base::Home())
 			{
 				Serial.print(F("Home "));
 			}
-			if (Share())
+			if (Base::Share())
 			{
 				Serial.print(F("Share "));
 			}
 			Serial.println();
 
 			Serial.print(F("Joy1(x,y)\t("));
-			Serial.print(Joy1X());
+			Serial.print(Base::Joy1X());
 			Serial.print(',');
-			Serial.print(Joy1Y());
+			Serial.print(Base::Joy1Y());
 			Serial.println(')');
 
-			if (FeatureJoy2())
+			if (Base::FeatureJoy2())
 			{
 				Serial.print(F("Joy2(x,y)\t("));
-				Serial.print(Joy2X());
+				Serial.print(Base::Joy2X());
 				Serial.print(',');
-				Serial.print(Joy2Y());
+				Serial.print(Base::Joy2Y());
 				Serial.println(')');
 			}
 
-			if (FeatureL2())
+			if (Base::FeatureL2())
 			{
 				Serial.print(F("L2\t"));
-				Serial.println(L2());
+				Serial.println(Base::L2());
 			}
 
-			if (FeatureR2())
+			if (Base::FeatureR2())
 			{
 				Serial.print(F("R2\t"));
-				Serial.println(R2());
+				Serial.println(Base::R2());
 			}
 		}
 	}
@@ -354,13 +354,13 @@ public:
 	{
 		Serial.println(F("Features: "));
 
-		if (FeatureStart() || FeatureSelect() || FeatureHome() || FeatureShare())
+		if (Base::FeatureStart() || Base::FeatureSelect() || Base::FeatureHome() || Base::FeatureShare())
 		{
 			Serial.print(F("\tMenu Buttons: "));
-			if (FeatureStart()) { Serial.print(F("Start ")); }
-			if (FeatureSelect()) { Serial.print(F("Select ")); }
-			if (FeatureHome()) { Serial.print(F("Home ")); }
-			if (FeatureShare()) { Serial.print(F("Share ")); }
+			if (Base::FeatureStart()) { Serial.print(F("Start ")); }
+			if (Base::FeatureSelect()) { Serial.print(F("Select ")); }
+			if (Base::FeatureHome()) { Serial.print(F("Home ")); }
+			if (Base::FeatureShare()) { Serial.print(F("Share ")); }
 			Serial.println();
 		}
 		else
@@ -368,11 +368,11 @@ public:
 			Serial.println(F("\tNo Menu buttons"));
 		}
 
-		if (FeatureJoy1() || FeatureJoy2())
+		if (Base::FeatureJoy1() || Base::FeatureJoy2())
 		{
 			Serial.print(F("\tJoysticks: "));
-			if (FeatureJoy1()) { Serial.print(F("Joy1 ")); }
-			if (FeatureJoy2()) { Serial.print(F("Joy2 ")); }
+			if (Base::FeatureJoy1()) { Serial.print(F("Joy1 ")); }
+			if (Base::FeatureJoy2()) { Serial.print(F("Joy2 ")); }
 			Serial.println();
 		}
 		else
@@ -380,7 +380,7 @@ public:
 			Serial.println(F("\tNo Joysticks"));
 		}
 
-		if (FeatureDPad())
+		if (Base::FeatureDPad())
 		{
 			Serial.print(F("\tDpad"));
 		}
@@ -390,13 +390,13 @@ public:
 		}
 		Serial.println();
 
-		if (FeatureA() || FeatureB() || FeatureX() || FeatureY())
+		if (Base::FeatureA() || Base::FeatureB() || Base::FeatureX() || Base::FeatureY())
 		{
 			Serial.print(F("\tFace Buttons: "));
-			if (FeatureA()) { Serial.print(F("A ")); }
-			if (FeatureB()) { Serial.print(F("B ")); }
-			if (FeatureX()) { Serial.print(F("X ")); }
-			if (FeatureY()) { Serial.print(F("Y ")); }
+			if (Base::FeatureA()) { Serial.print(F("A ")); }
+			if (Base::FeatureB()) { Serial.print(F("B ")); }
+			if (Base::FeatureX()) { Serial.print(F("X ")); }
+			if (Base::FeatureY()) { Serial.print(F("Y ")); }
 			Serial.println();
 		}
 		else
@@ -404,11 +404,11 @@ public:
 			Serial.println(F("\tNo Face buttons"));
 		}
 
-		if (FeatureL2() || FeatureR2())
+		if (Base::FeatureL2() || Base::FeatureR2())
 		{
 			Serial.print(F("\tJoystick Buttons: "));
-			if (FeatureL3()) { Serial.print(F("L3 ")); }
-			if (FeatureR3()) { Serial.print(F("R3 ")); }
+			if (Base::FeatureL3()) { Serial.print(F("L3 ")); }
+			if (Base::FeatureR3()) { Serial.print(F("R3 ")); }
 			Serial.println();
 		}
 		else
@@ -416,11 +416,11 @@ public:
 			Serial.println(F("\tNo Joystick buttons"));
 		}
 
-		if (FeatureL1() || FeatureR1())
+		if (Base::FeatureL1() || Base::FeatureR1())
 		{
 			Serial.print(F("\tShoulder buttons: "));
-			if (FeatureL1()) { Serial.print(F("L1 ")); }
-			if (FeatureR1()) { Serial.print(F("R1 ")); }
+			if (Base::FeatureL1()) { Serial.print(F("L1 ")); }
+			if (Base::FeatureR1()) { Serial.print(F("R1 ")); }
 			Serial.println();
 		}
 		else
@@ -428,16 +428,28 @@ public:
 			Serial.println(F("\tNo Shoulder buttons"));
 		}
 
-		if (FeatureL2() || FeatureR2())
+		if (Base::FeatureL2() || Base::FeatureR2())
 		{
 			Serial.print(F("\tTriggers: "));
-			if (FeatureL2()) { Serial.print(F("L2 ")); }
-			if (FeatureR2()) { Serial.print(F("R2 ")); }
+			if (Base::FeatureL2()) { Serial.print(F("L2 ")); }
+			if (Base::FeatureR2()) { Serial.print(F("R2 ")); }
 			Serial.println();
 		}
 		else
 		{
 			Serial.println(F("\tNo triggers"));
+		}
+
+		if (Base::FeatureMotion())
+		{
+			Serial.print(F("\tMotion: "));
+			Serial.print(F("Accelerometer "));
+			Serial.print(F("Gyro "));
+			Serial.println();
+		}
+		else
+		{
+			Serial.println(F("\tNo motion"));
 		}
 		Serial.println();
 	}
@@ -445,17 +457,17 @@ public:
 	void LogPropertiesNavigation()
 	{
 		Serial.println(F("Properties: "));
-		if (PropertyJoy1Digital())
+		if (Base::PropertyJoy1Digital())
 		{
 			Serial.println(F("\tJoy1 is Digital"));
 		}
 
-		if (PropertyJoy2Digital())
+		if (Base::PropertyJoy2Digital())
 		{
 			Serial.println(F("\tJoy2 is Digital"));
 		}
 
-		if (PropertyL2R2Digital())
+		if (Base::PropertyL2R2Digital())
 		{
 			Serial.println(F("\tL1 and R1 are Digital"));
 		}
@@ -463,31 +475,32 @@ public:
 		Serial.println();
 
 		Serial.println(F("Navigation: "));
-		switch (VirtualPadConfiguration::GetNavigation(ConfigurationCode))
+
+		switch (Base::ConfigurationNavigation())
 		{
-		case NavigationEnum::BA:
+		case VirtualPad::Configuration::NavigationEnum::BA:
 			Serial.println(F("BA"));
 			break;
-		case NavigationEnum::XA:
+		case VirtualPad::Configuration::NavigationEnum::XA:
 			Serial.println(F("XA"));
 			break;
-		case NavigationEnum::BY:
+		case VirtualPad::Configuration::NavigationEnum::BY:
 			Serial.println(F("BY"));
 			break;
-		case NavigationEnum::AY:
+		case VirtualPad::Configuration::NavigationEnum::AY:
 			Serial.println(F("AY"));
 			break;
-		case NavigationEnum::BX:
+		case VirtualPad::Configuration::NavigationEnum::BX:
 			Serial.println(F("BX"));
 			break;
-		case NavigationEnum::AX:
+		case VirtualPad::Configuration::NavigationEnum::AX:
 			Serial.println(F("AX"));
 			break;
-		case NavigationEnum::XB:
+		case VirtualPad::Configuration::NavigationEnum::XB:
 			Serial.println(F("XB"));
 			break;
 		default:
-		case NavigationEnum::AB:
+		case VirtualPad::Configuration::NavigationEnum::AB:
 			Serial.println(F("AB"));
 			break;
 		}

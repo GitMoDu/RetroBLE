@@ -46,7 +46,7 @@ namespace Device
 	{
 		static constexpr uint32_t ConfigurationCode =
 			VirtualPad::Configuration::GetConfigurationCode(
-				VirtualPad::Configuration::GetFeatureFlags< VirtualPad::Configuration::FeaturesEnum::DPad,
+				VirtualPad::Configuration::GetFeatureFlags<VirtualPad::Configuration::FeaturesEnum::DPad,
 				VirtualPad::Configuration::FeaturesEnum::Joy1,
 				VirtualPad::Configuration::FeaturesEnum::Joy2,
 				VirtualPad::Configuration::FeaturesEnum::Start, VirtualPad::Configuration::FeaturesEnum::Select,
@@ -55,8 +55,7 @@ namespace Device
 				VirtualPad::Configuration::FeaturesEnum::X, VirtualPad::Configuration::FeaturesEnum::Y,
 				VirtualPad::Configuration::FeaturesEnum::L1, VirtualPad::Configuration::FeaturesEnum::R1,
 				VirtualPad::Configuration::FeaturesEnum::L2, VirtualPad::Configuration::FeaturesEnum::R2,
-				VirtualPad::Configuration::FeaturesEnum::L3, VirtualPad::Configuration::FeaturesEnum::R3,
-				VirtualPad::Configuration::FeaturesEnum::Motion>(),
+				VirtualPad::Configuration::FeaturesEnum::L3, VirtualPad::Configuration::FeaturesEnum::R3>(),
 				VirtualPad::Configuration::NoProperties,
 				VirtualPad::Configuration::NavigationEnum::AB);
 	}
