@@ -160,11 +160,11 @@ public:
 			{
 				Serial.print(F("Home "));
 			}
-			if (Base::GetAccept())
+			if (Base::Accept())
 			{
 				Serial.print(F("Accept "));
 			}
-			if (Base::GetReject())
+			if (Base::Reject())
 			{
 				Serial.print(F("Reject "));
 			}
