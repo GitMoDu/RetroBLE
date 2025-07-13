@@ -164,7 +164,7 @@ public:
 			else
 			{
 				Serial.print(F("No UUID Match Report: "));
-				Serial.println(uuid1);
+				Serial.println(uuid);
 			}
 #endif
 		}

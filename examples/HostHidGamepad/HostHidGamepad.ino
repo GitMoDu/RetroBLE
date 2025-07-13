@@ -6,6 +6,7 @@
 *   - Core:
 *   - Reference Central: https://github.com/asukiaaa/nrf52-bluefluit-xbox-controller-practice/tree/master
 *	- Uart interface:  https://github.com/GitMoDu/UartInterface
+*	- Pad abstraction:  https://github.com/GitMoDu/VirtualPad
 */
 
 //#define DEBUG
@@ -29,8 +30,12 @@ HidToVirtualPad<Device::VirtualPadUartInterface::ConfigurationCode> Pad{};
 BleCentral Central(&Pad);
 
 // Uart server.
-using UartType = Uart;
-VirtualPadUartServer<UartType> UartServer(SchedulerBase, Serial1, Pad);
+#if defined(DEBUG1)
+VirtualPadUartInterface::ServerTask<Adafruit_USBD_CDC> UartServer(SchedulerBase, Serial, Pad);
+#else
+VirtualPadUartInterface::ServerTask<Uart> UartServer(SchedulerBase, Serial1, Pad);
+#endif
+
 
 void setup()
 {
@@ -41,12 +46,8 @@ void setup()
 	while (!Serial)
 		delay(10);
 
-	Serial.println(F("Host Hid Gamepad start"));
-
 	Pad.LogFeatures();
 	Pad.LogPropertiesNavigation();
-
-	Serial.flush();
 #endif
 
 	// Disable unused pins.
@@ -58,8 +59,19 @@ void setup()
 		connection_secured_callback,
 		report_notification_callback);
 
+
+	if (!UartServer.Setup())
+	{
+		while (true)
+			;;
+	}
+
 	// Start pushing out state updates on UART.
 	UartServer.Start();
+
+#if defined(DEBUG)
+	Serial.println(F("Host Hid Gamepad start"));
+#endif
 }
 
 void loop()
