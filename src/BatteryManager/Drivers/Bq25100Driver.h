@@ -88,7 +88,7 @@ public:
 	/// Wake on battery charging state change.
 	/// </summary>
 	/// <returns>False if sleep isn't possible right now.</returns>
-	virtual const bool WakeOnInterrupt() final
+	virtual bool WakeOnInterrupt() final
 	{
 		if (Charging == !digitalRead((uint8_t)Pin::Charging))
 		{

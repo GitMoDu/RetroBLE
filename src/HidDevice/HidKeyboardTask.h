@@ -47,14 +47,14 @@ protected:
 	/// ISleep interface.
 	/// </summary>
 public:
-	virtual const bool WakeOnInterrupt() { return false; }
-	virtual void OnWakeUp() { }
+	virtual bool WakeOnInterrupt() { return false; }
+	virtual void OnWakeUp() {}
 
 	/// <summary>
 	/// IHidDevice interface.
 	/// </summary>
 public:
-	virtual const bool IsPowerDownRequested() { return false; }
+	virtual bool IsPowerDownRequested() const { return false; }
 
 public:
 	HidKeyboardTask(TS::Scheduler& scheduler,
@@ -68,7 +68,8 @@ public:
 		, BleKeyboard(bleKeyboard)
 		, UsbPeriod(usbUpdatePeriod)
 		, BlePeriod(bleUpdatePeriod)
-	{}
+	{
+	}
 
 	void OnWakeInterrupt()
 	{
@@ -109,7 +110,7 @@ public:
 
 		for (size_t i = 0; i < sizeof(hid_keyboard_report_t::keycode); i++)
 		{
-			if ((LastHidReport.keycode[i]!= HidReport.keycode[i]))
+			if ((LastHidReport.keycode[i] != HidReport.keycode[i]))
 			{
 				LastHidReport.modifier = HidReport.modifier;
 				memcpy(LastHidReport.keycode, HidReport.keycode, sizeof(hid_keyboard_report_t::keycode));
@@ -118,7 +119,6 @@ public:
 				return true;
 			}
 		}
-
 
 		return true;
 	}
@@ -132,7 +132,7 @@ public:
 		}
 	}
 
-	virtual const uint32_t GetElapsedMillisSinceLastActivity() const final
+	virtual uint32_t GetElapsedMillisSinceLastActivity() const final
 	{
 		return millis() - LastActivity;
 	}

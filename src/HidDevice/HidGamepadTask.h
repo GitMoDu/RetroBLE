@@ -44,7 +44,7 @@ protected:
 	/// ISleep interface.
 	/// </summary>
 public:
-	virtual const bool WakeOnInterrupt() { return false; }
+	virtual bool WakeOnInterrupt() { return false; }
 	virtual void OnWakeUp() { }
 
 	/// <summary>
@@ -114,7 +114,7 @@ public:
 		}
 	}
 
-	virtual const uint32_t GetElapsedMillisSinceLastActivity() const final
+	virtual uint32_t GetElapsedMillisSinceLastActivity() const final
 	{
 		return millis() - LastActivity;
 	}

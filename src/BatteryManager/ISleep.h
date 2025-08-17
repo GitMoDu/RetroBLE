@@ -13,12 +13,12 @@ namespace BatteryManager
 		/// Sleep peripheral and setup wake event.
 		/// </summary>
 		/// <returns>False if sleep isn't possible right now.</returns>
-		virtual const bool WakeOnInterrupt() { return false; }
+		virtual bool WakeOnInterrupt() = 0;
 
 		/// <summary>
 		/// Device has just woken up from sleep, restore peripheral.
 		/// </summary>
-		virtual void OnWakeUp() { }
+		virtual void OnWakeUp() = 0;
 	};
 }
 #endif

@@ -16,11 +16,11 @@ public:
 	};
 
 public:
-	virtual void SetTarget(TargetEnum target) {}
-	virtual const uint32_t GetElapsedMillisSinceLastActivity() const { return UINT32_MAX; }
+	virtual void SetTarget(TargetEnum target) = 0;
+	virtual uint32_t GetElapsedMillisSinceLastActivity() const  = 0; //const { return UINT32_MAX; }
 
 public:
-	virtual const bool IsPowerDownRequested() { return true; }
+	virtual bool IsPowerDownRequested() const = 0; //{ return false; }
 };
 
 #endif

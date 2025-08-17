@@ -18,6 +18,6 @@ public:
 	};
 
 public:
-	virtual void SetDrawMode(const IIndicator::StateEnum indicatorState, const bool charging) {}
+	virtual void SetDrawMode(const IIndicator::StateEnum indicatorState, const bool charging) = 0;
 };
 #endif
