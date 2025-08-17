@@ -1,5 +1,3 @@
-// HidKeyboardTask.h
-
 #ifndef _HID_KEYBOARD_TASK_h
 #define _HID_KEYBOARD_TASK_h
 

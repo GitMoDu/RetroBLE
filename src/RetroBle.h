@@ -1,5 +1,3 @@
-// RetroBle.h
-
 #ifndef _RETRO_BLE_INCLUDE_h
 #define _RETRO_BLE_INCLUDE_h
 

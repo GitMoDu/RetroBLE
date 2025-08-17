@@ -1,5 +1,3 @@
-// IIndicator.h
-
 #ifndef _I_INDICATOR_h
 #define _I_INDICATOR_h
 

@@ -1,5 +1,3 @@
-// UsbPeripheral.h
-
 #ifndef _USB_PERIPHERAL_h
 #define _USB_PERIPHERAL_h
 

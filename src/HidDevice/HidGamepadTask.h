@@ -1,5 +1,3 @@
-// HidGamepadTask.h
-
 #ifndef _HID_GAMEPAD_TASK_h
 #define _HID_GAMEPAD_TASK_h
 

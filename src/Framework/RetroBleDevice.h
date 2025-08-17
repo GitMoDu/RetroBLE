@@ -1,5 +1,3 @@
-// RetroBleDevice.h
-
 #ifndef _RETRO_BLE_DEVICE_h
 #define _RETRO_BLE_DEVICE_h
 

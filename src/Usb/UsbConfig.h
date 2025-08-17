@@ -1,5 +1,3 @@
-// UsbConfig.h
-
 #ifndef _USB_CONFIG_h
 #define _USB_CONFIG_h
 
