@@ -13,13 +13,13 @@
 #include "IHidDevice.h"
 
 /// <summary>
-/// Abstract task for Gamepad HID reporting, with fixed period.
-/// Combined HID reporting, for BLE or USB Gamepad.
+/// Abstract task for Keyboard HID reporting, with fixed period.
+/// Combined HID reporting, for BLE or USB Keyboard.
 /// Inherited classes must implement virtual methods.
 ///////		OnStart - Setup pin and prepare for runtime operation.
 ///////		OnStop - Stop any active operation and setup pins for wake on interrupt.
-///		UpdateState - Update controller state and populate HID report.
-///		IsPowerDownRequested - Controller has requested device to power down.
+///		UpdateState - Update keyboard state and populate HID report.
+///		IsPowerDownRequested - Keyboard has requested device to power down.
 /// </summary>
 class HidKeyboardTask : public virtual IHidDevice, private TS::Task
 {
@@ -36,7 +36,7 @@ private:
 	hid_keyboard_report_t LastHidReport{};
 
 private:
-	//void (*WakeInterrupt)() = nullptr;
+	//void (*WakeInterrupt)() = nullptr; //TODO:
 	uint32_t LastActivity = 0;
 	TargetEnum Target = TargetEnum::None;
 
@@ -142,22 +142,6 @@ protected:
 	{
 		LastActivity = millis();
 	}
-
-	//private:
-	//	void ResetReports()
-	//	{
-	//		HidReport.buttons = 0;
-	//		HidReport.hat = 0;
-	//		HidReport.x = 0;
-	//		HidReport.y = 0;
-	//		HidReport.z = 0;
-	//		HidReport.rx = 0;
-	//		HidReport.ry = 0;
-	//		HidReport.rz = 0;
-	//
-	//		LastHidReport.buttons = HidReport.buttons;
-	//		LastHidReport.hat = HidReport.hat;
-	//	}
 };
 #endif
 #endif
