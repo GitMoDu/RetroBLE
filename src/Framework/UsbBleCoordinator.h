@@ -79,9 +79,6 @@ namespace RetroBle
 				State = StateEnum::Booting;
 				TS::Task::enableDelayed(0);
 
-				BleDev.SetBleListener(this);
-				//usbDevice.SetUsbListener(this);
-
 				return true;
 			}
 			return false;
@@ -259,20 +256,18 @@ namespace RetroBle
 			TS::Task::delay(0);
 		}
 
-		void OnUsbBackReport(uint8_t report_id, hid_report_type_t report_type, uint8_t const* buffer, uint16_t bufsize) final
+		void OnUsbBackReport(uint8_t report_id, uint8_t report_type, uint8_t const* buffer, uint16_t bufsize) final
 		{
 			// Forward to listener.
 			if (HidBackReportListener != nullptr)
-				HidBackReportListener->OnBackReport(HidBackReport::SourceEnum::Usb,
-					report_id, report_type, buffer, bufsize);
+				HidBackReportListener->OnBackReport(report_id, report_type, buffer, bufsize);
 		}
 
-		void OnBleBackReport(uint8_t report_id, hid_report_type_t report_type, uint8_t const* buffer, uint16_t bufsize) final
+		void OnBleBackReport(uint8_t report_id, uint8_t report_type, uint8_t const* buffer, uint16_t bufsize) final
 		{
 			// Forward to listener.
 			if (HidBackReportListener != nullptr)
-				HidBackReportListener->OnBackReport(HidBackReport::SourceEnum::Ble,
-					report_id, report_type, buffer, bufsize);
+				HidBackReportListener->OnBackReport(report_id, report_type, buffer, bufsize);
 		}
 
 	private:

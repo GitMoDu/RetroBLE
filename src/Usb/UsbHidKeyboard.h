@@ -22,12 +22,12 @@ private:
 private:
 	IUsbListener* Listener = nullptr;
 
-
 public:
 	UsbHidKeyboard()
 		: HidInstance(RetroBle::UsbConfig::Descriptor::HidKeyboard, sizeof(RetroBle::UsbConfig::Descriptor::HidKeyboard),
 			HID_ITF_PROTOCOL_KEYBOARD, 2, false)
-	{}
+	{
+	}
 
 	void Setup(const char* description,
 		uint16_t(*onGetReportInterrupt)(uint8_t report_id, hid_report_type_t report_type, uint8_t* buffer, uint16_t reqlen) = nullptr,
@@ -65,25 +65,23 @@ public:
 		Listener = listener;
 	}
 
-	const bool IsReady()
+	bool IsReady()
 	{
-		//return false;
 		return HidInstance.ready();
 	}
 
 public:
 	const uint16_t OnGetReportInterrupt(uint8_t report_id, hid_report_type_t report_type, uint8_t* buffer, uint16_t reqlen)
 	{
-		if (Listener != nullptr)
-		{
-			Listener->OnUsbBackReport(report_id, report_type, buffer, reqlen);
-		}
-
 		return 0;
 	}
 
 	void OnSetReportInterrupt(uint8_t report_id, hid_report_type_t report_type, uint8_t const* buffer, uint16_t bufsize)
 	{
+		if (Listener != nullptr)
+		{
+			Listener->OnUsbBackReport(report_id, report_type, buffer, bufsize);
+		}
 	}
 };
 

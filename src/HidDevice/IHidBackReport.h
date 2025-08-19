@@ -7,21 +7,16 @@ namespace RetroBle
 {
 	namespace HidBackReport
 	{
-		enum class SourceEnum
+		enum class IdEnum : uint8_t
 		{
-			Usb,
-			Ble
-		};
-		enum class IdEnum : uint16_t
-		{
-			KeyboardLights = 0xFF - 1,
-			Rumble = 0xFF - 2
+			KeyboardLights = 0,
+			Rumble = 0xFF - 1
 		};
 
 		struct IListener
 		{
-			virtual void OnBackReport(SourceEnum backReportSource, uint8_t report_id, hid_report_type_t report_type, uint8_t const* buffer, uint16_t bufsize) = 0;
+			virtual void OnBackReport(uint8_t report_id, uint8_t report_type, uint8_t const* buffer, uint16_t bufsize) = 0;
 		};
-	}	
+	}
 }
 #endif
