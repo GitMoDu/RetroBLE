@@ -1,5 +1,3 @@
-// IBleListener.h
-
 #ifndef _I_BLE_LISTENER_h
 #define _I_BLE_LISTENER_h
 
@@ -8,7 +6,9 @@
 class IBleListener
 {
 public:
-	virtual void OnBleStateChange() {}
+	virtual void OnBleStateChange() = 0;
+
+	virtual void OnBleBackReport(uint8_t report_id, hid_report_type_t report_type, uint8_t const* buffer, uint16_t bufsize) = 0;
 };
 #endif
 

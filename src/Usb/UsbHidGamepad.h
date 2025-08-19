@@ -1,5 +1,3 @@
-// UsbHidGamepad.h
-
 #ifndef _USB_HID_GAMEPAD_h
 #define _USB_HID_GAMEPAD_h
 
@@ -8,7 +6,6 @@
 
 /// <summary>
 /// TODO: Callbacks for connection events.
-/// TODO: Callbacks for events dispatched by host.
 /// </summary>
 class UsbHidGamepad
 {
@@ -49,7 +46,7 @@ public:
 		HidInstance.begin();
 	}
 
-	const bool NotifyGamepad(hid_gamepad_report_t& report)
+	bool NotifyGamepad(hid_gamepad_report_t& report)
 	{
 		return HidInstance.sendReport(0, &report, sizeof(hid_gamepad_report_t));
 	}
@@ -59,13 +56,13 @@ public:
 		Listener = listener;
 	}
 
-	const bool IsReady()
+	bool IsReady()
 	{
 		return HidInstance.ready();
 	}
 
 public:
-	const uint16_t OnGetReportInterrupt(uint8_t report_id, hid_report_type_t report_type, uint8_t* buffer, uint16_t reqlen)
+	uint16_t OnGetReportInterrupt(uint8_t report_id, hid_report_type_t report_type, uint8_t* buffer, uint16_t reqlen)
 	{
 		if (Listener != nullptr)
 		{

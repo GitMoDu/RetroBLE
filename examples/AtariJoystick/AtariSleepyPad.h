@@ -43,7 +43,7 @@ public:
 #endif
 	}
 
-	virtual const bool WakeOnInterrupt() final
+	virtual bool WakeOnInterrupt() final
 	{
 		if (WakePin != UINT8_MAX)
 		{

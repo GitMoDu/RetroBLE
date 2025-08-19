@@ -123,7 +123,7 @@ public:
 		return true;
 	}
 
-	virtual void SetTarget(TargetEnum target) final
+	void SetTarget(TargetEnum target) final
 	{
 		if (Target != target)
 		{
@@ -132,7 +132,7 @@ public:
 		}
 	}
 
-	virtual uint32_t GetElapsedMillisSinceLastActivity() const final
+	uint32_t GetElapsedMillisSinceLastActivity() const final
 	{
 		return millis() - LastActivity;
 	}
