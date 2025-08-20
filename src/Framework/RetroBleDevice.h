@@ -251,6 +251,18 @@ namespace RetroBle
 			WiiUPro = (uint16_t)ProductBase::WiiU + 1,
 
 		};
+
+		/// <summary>
+		/// Custom Product Id table for RetroBLE.
+		/// Keeps track of deployed devices, add as needed to avoid collisions.
+		/// </summary>
+		enum class CustomProductIds : uint16_t
+		{
+			/// <summary>
+			/// Custom device, Model M Keyboard.
+			/// </summary>
+			KeyboardModelM = (uint16_t)ProductBase::Custom - 1
+		};
 	}
 }
 #endif
