@@ -1,4 +1,4 @@
-# RetroBLE
+# ![Connecting past devices to the present](https://github.com/GitMoDu/RetroBLE/blob/master/media/banner.jpg)
 
 Arduino framework for combined BLE/USB HID devices using nRF52850.
 
