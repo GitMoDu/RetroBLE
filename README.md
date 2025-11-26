@@ -33,7 +33,7 @@ The framework is built around the [Bluefruit library](https://github.com/adafrui
 
 ![](https://raw.githubusercontent.com/GitMoDu/RetroBLE/master/media/mega_drive_control_pad.jpg)
 
-[Model M Keyboard (1985)](https://github.com/GitMoDu/ModernModelM)
+[Model M Keyboard (1984)](https://github.com/GitMoDu/ModernModelM)
 
 ![](https://github.com/GitMoDu/ModernModelM/blob/master/media/modelm.jpg)
 
